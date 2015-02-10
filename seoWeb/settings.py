@@ -1,5 +1,5 @@
 """
-Django settings for taoWeb project.
+Django settings for seoWeb project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -51,9 +51,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'taoWeb.urls'
+ROOT_URLCONF = 'seoWeb.urls'
 
-WSGI_APPLICATION = 'taoWeb.wsgi.application'
+WSGI_APPLICATION = 'seoWeb.wsgi.application'
 
 
 # Database

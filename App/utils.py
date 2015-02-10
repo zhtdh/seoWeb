@@ -2,7 +2,7 @@ __author__ = 'donghai'
 
 import os
 from datetime import datetime,date
-from taoWeb.settings import BASE_DIR, DEBUG
+from seoWeb.settings import BASE_DIR, DEBUG
 import sys
 import json
 from decimal import Decimal
