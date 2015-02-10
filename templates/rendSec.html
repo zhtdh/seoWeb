@@ -1,6 +1,12 @@
+{% extends "foreBase.html" %}
+
+{% block title %} 首页标题 {% endblock %}
+
+{% block baseContent %}
+
 
 <div class="row " style="height:300px;padding-left:15px">
-  <img class="img-responsive block-shadow" src="static/img/top1.jpg">
+  <img class="img-responsive block-shadow" src="/static/img/top1.jpg">
 </div>
 
 <br>
@@ -26,7 +32,7 @@
         </div>
         <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
           <div class="panel-body">
-            <img class = "img-responsive" src="static/img/headshot4.jpg" alt="iphone">
+            <img class = "img-responsive" src="/static/img/headshot4.jpg" alt="iphone">
           </div>
         </div>
       </div>
@@ -65,5 +71,4 @@
 </div>
 
 
-
-<div ui-view></div>
+{% endblock %}

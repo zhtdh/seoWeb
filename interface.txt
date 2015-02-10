@@ -1,7 +1,11 @@
 全部基于post的方式。
 ====================================================================
-表column: id, parentid, kind, title, link.    + hasmenu (是否有子菜单),
-表article: id, parentid, kind, title, content, imglink, videolink, recname, rectime.
+表column: id, parentid, kind, title, link. ordernum.
++ exorder
+
+表article: id, parentid, title, content, imglink, videolink, recname, rectime.
++ exorder
+
 表user:    username, pw.
 =====================================================================
 
