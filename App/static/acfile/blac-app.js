@@ -46,7 +46,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       url: "/listuser",
       templateUrl: "partials/acadminlistuser.html"
     })
-    .state('acadmin.extools', {
+    .state('extools', {
       url: "/extools",
       templateUrl: "partials/exTools.html"
     }) ;

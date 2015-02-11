@@ -1,7 +1,9 @@
 __author__ = 'blaczom'
 from django.shortcuts import render,HttpResponse
 from django.http import HttpResponseRedirect
+from django.views.decorators.http import *
 
+@require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
   if goolArg == "resec" :
     return render(request, "rendSec.html")
