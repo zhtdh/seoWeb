@@ -10,3 +10,9 @@ def getCorpInfo():
             .filter(kind__icontains='corpinfo').values('content')[0]['content']
     except IndexError:
         return "无简介"
+def getContact():
+    try:
+        return Article.objects.filter(parent_id='0')\
+            .filter(kind__icontains='topContact').values('content')[0]['content']
+    except IndexError:
+        return "无联系方式"

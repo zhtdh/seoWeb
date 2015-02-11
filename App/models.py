@@ -4,7 +4,11 @@ import datetime
 # Create your models here.
 
 BoolCharacter=(('Y','是'),('N','否'))
-
+# kindType=(('corpInfo','公司简介'),
+#           ('topContact','联系我们'),
+#           ('topApp','应用'),
+#           ('topCase','案例'),
+#           ('topContact','行业'))
 class BaseModel(models.Model):
     ''''''
     recname = models.CharField('创建人员',max_length=32,blank=True,null=True)

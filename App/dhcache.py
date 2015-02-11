@@ -3,7 +3,8 @@ from django.shortcuts import render, HttpResponse
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import *
 
-from App.viewsFore import getCorpInfo
+from App.viewsFore import getCorpInfo,getContact
+from App.utils import log
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
     try:
@@ -17,7 +18,8 @@ def gool(request, goolArg="", goolSecArg=""):
         elif goolArg == "refiv":
             return render(request, "rendFiv.html", locals())
         elif goolArg == "recon":
-            return render(request, "rendCon.html")
+            contact = getContact
+            return render(request, "rendCon.html",locals())
         else:
             return HttpResponseRedirect("/")
     except Exception as e:
