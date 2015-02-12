@@ -1,5 +1,5 @@
 <div class="container-fluid" >
-  <div class="row" style="min-height: 450px;" ng-controller="ctrlAdminLeft">
+  <div class="row" id="ctrlAdminLeft" style="min-height: 450px;" ng-controller="ctrlAdminLeft">
     <div class="col-md-3 sidebar" style="padding-left: 0px;" >
 
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="font-size:1.2em; line-height: 1.6em; ">
@@ -9,6 +9,7 @@
               <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="./#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                 内容编辑
               </a>
+              <a ng-click="treeExpandCol()" style="float: right"> 全部展开 </a>
             </h4>
           </div>
           <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
@@ -86,6 +87,8 @@
               <button ng-click="saveTree()" class="btn btn-success" > save </button>
               <button ng-click="wrapConfirm('确认放弃修改么？', initColumDefTree)" class="btn btn-success" > reset </button>
               <button ng-click="treeExpandAll()" class="btn btn-success" > 全部展开 </button>
+              <br>
+              <input type="file" id="file" onchange="handleFiles(this.files)" value="读入文件"/>
             </div>
           </div>
         </div>
@@ -103,3 +106,20 @@
   </div>
 </div>
 
+<script>
+  function handleFiles(files) {
+    if (files.length) {
+        var file = files[0];
+        var reader = new FileReader();
+        if (/text\/\w+/.test(file.type)) {
+            reader.onload = function() {
+              var scope = angular.element( document.getElementById('ctrlAdminLeft') ).scope();
+              console.log(scope, JSON.parse(this.result));
+              scope.treeData = JSON.parse(this.result);
+              scope.$apply();
+            }
+            reader.readAsText(file);
+        }
+    }
+}
+</script>

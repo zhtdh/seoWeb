@@ -193,3 +193,11 @@ jpargs:{
     parentId: "xxxxx"
     id : "xxxxx"
     hasContent： 1 返回记录中包括content，other：不包括。
+
+
+
+
+============================
+database说明：
+导出的栏目数据。导入：
+替换： "items":     -> "state": "new","items":

@@ -164,6 +164,9 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
           console.log(data);
         });
     }
+    lp.treeExpandCol = function(){
+      angular.element(document.getElementById("tree-content-root")).scope().expandAll();
+    }
   }
 
   // 后台管理端：  用户录入内容。

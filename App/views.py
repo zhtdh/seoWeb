@@ -2,52 +2,58 @@
 from django.db import connection,transaction
 from django.shortcuts import render,HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.utils import IntegrityError,DatabaseError
+from django.db.utils import IntegrityError, DatabaseError
 from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
-from App.utils import log,AppException,logErr
+from App.utils import log, AppException, logErr
 from App.models import *
 from App.ueditor.views import get_ueditor_controller
 
+
 def test1(request):
     return render(request, "App/test.html")
-def paramCheck(standard_set,target_set,check_type):
-    '''
+
+
+def paramCheck(standard_set, target_set, check_type):
+    """
     检查参数是否合法
     :param standard_set:标准set
     :param target_set: 检验set
     :param check_type: (‘必要’,'')
     :return:
-    '''
+    """
+    
+    
 def getPageRowNo(p_dict):
-    '''
+    """
     返回分页firstRow,lastRow
     :param p_dict: {pageCurrent:当前页, pageRows:一页的行数,pageTotal: 0}
     :return: (firstRowNo,lastRowNo)
-    '''
+    """
     if 'pageCurrent' not in p_dict or 'pageRows' not in p_dict or 'pageTotal' not in p_dict:
         raise AppException('上传分页参数错误')
-    if not (isinstance(p_dict['pageCurrent'],int) and \
-                    isinstance(p_dict['pageRows'],int) and \
-                    isinstance(p_dict['pageTotal'],int)):
+    if not (isinstance(p_dict['pageCurrent'], int) and
+                isinstance(p_dict['pageRows'], int) and
+                isinstance(p_dict['pageTotal'], int)):
         raise AppException('上传分页参数错误')
     firstRow = (p_dict['pageCurrent'] - 1) * p_dict['pageRows']
     lastRow = firstRow + p_dict['pageRows']
     if p_dict['pageTotal'] == 0:
         rowTotal = 0
     else:
-        rowTotal = -1;
-    return (firstRow,lastRow,rowTotal)
-def logon(session,p_user,p_rtn):
-    '''
+        rowTotal = -1
+    return (firstRow, lastRow, rowTotal)
 
+
+def logon(session,p_user,p_rtn):
+    """
     :param session:
     :param p_user: { md5: "6547436690a26a399603a7096e876a2d"
                                            username: "aaa" }
     :param p_rtn:
     :return:
-    '''
+    """
     ls_name = p_user['username']
     ls_pw = p_user['md5']
     try:
@@ -116,7 +122,7 @@ def saveArticleType(p_AType):
         for item in p_AType['items']:
             saveArticleType(item)
 def dealArticleType(p_dict,p_rtn):
-    '''
+    """
     :param p_dict = {
         "id": 0,
         "title": "根",
@@ -137,7 +143,7 @@ def dealArticleType(p_dict,p_rtn):
               clean：不用
     :param p_rtn: 返回结构
     :return:
-    '''
+    """
 
     if 'deleteId' in p_dict:
         ArticleType.objects.filter(id__in=p_dict['deleteId']).delete()
@@ -150,11 +156,11 @@ def dealArticleType(p_dict,p_rtn):
         "rtnCode": 1
     })
 def getArticleType(p_rtn):
-    '''
+    """
     返回全部ArticleType
     :param p_rtn:
     :return:
-    '''
+    """
     l_rtn = {}
     try:
         root = ArticleType.objects.get(id='0')
@@ -193,13 +199,13 @@ def getSubArticleType(p_parentId,p_items):
             'items':items
         })
 def getArticleList(p_dict,p_rtn):
-    '''
+    """
     :param p_dict:{
         location: { pageCurrent:当前页, pageRows:一页的行数,pageTotal:共有多少页 },
         columnId:'xxx'
      }
     :return:
-    '''
+    """
     if 'columnId' not in p_dict or 'location' not in p_dict:
         raise AppException('上传参数错误')
     firstRow,lastRow,rowTotal = getPageRowNo(p_dict['location'])
@@ -220,12 +226,12 @@ def getArticleList(p_dict,p_rtn):
         }
     })
 def getArticle(p_dict,p_rtn):
-    '''
+    """
     查询指定article
     :param p_dict: { articleId: xxx }
     :param p_rtn:
     :return:
-    '''
+    """
     if 'articleId' not in p_dict:
         raise AppException('上传参数错误')
     try:
@@ -253,7 +259,7 @@ def getArticle(p_dict,p_rtn):
             "rtnCode":-1
         })
 def setArticle(p_dict,p_rtn,session):
-    '''
+    """
     增删改Article
     :param p_dict:{ article:{
                         state:"new",
@@ -274,7 +280,7 @@ def setArticle(p_dict,p_rtn,session):
               clean：不用
     :param p_rtn:
     :return:
-    '''
+    """
     if "article" not in p_dict:
         raise AppException('上传参数错误')
     p_article = p_dict['article'].copy()
@@ -313,6 +319,8 @@ def setArticle(p_dict,p_rtn,session):
         "rtnInfo": "成功",
         "rtnCode": 1
     })
+
+
 def deleteArticle(p_dict,p_rtn,session):
     if 'articleId' not in p_dict:
         raise AppException('上传参数错误')
@@ -328,13 +336,14 @@ def deleteArticle(p_dict,p_rtn,session):
             "rtnInfo": "非本人发布，不能删除",
             "rtnCode": -1
         })
+
 def setUser(p_dict,p_rtn,session):
-    '''
+    """
     维护User
     :param p_dict: { state:"new", username: xxx , pw : xxx, oldWord: xxx}
     :param p_rtn:
     :return:
-    '''
+    """
 #    p_dict = p_dict['user']
     p_set = set(p_dict.keys())
     p_checkset = set(['_exState','username','pw'])
@@ -379,13 +388,13 @@ def setUser(p_dict,p_rtn,session):
             "rtnCode": -1
         })
 def deleteUser(p_dict,p_rtn,session):
-    '''
+    """
     删除user
     :param p_dict: { username: xxx }
     :param p_rtn:
     :param session:
     :return:
-    '''
+    """
     if 'username' not in p_dict:
         raise AppException('上传参数错误')
     if session['username'] == 'Admin':
@@ -400,12 +409,12 @@ def deleteUser(p_dict,p_rtn,session):
             "rtnCode": -1
         })
 def getUserList(p_dict,p_rtn):
-    '''
+    """
     :param p_dict:{
         pageCurrent:当前页, pageRows:一页的行数,pageTotal:共有多少页
      }
     :return:
-    '''
+    """
 
     firstRow,lastRow,rowTotal = getPageRowNo(p_dict)
     users = list(User.objects.exclude(username__exact='Admin').order_by('username').values('username')[firstRow:lastRow])
@@ -424,7 +433,7 @@ def getUserList(p_dict,p_rtn):
         }
     })
 def resetPw(p_dict,p_rtn):
-    '''
+    """
     修改用户密码
     :param p_dict:{ "username":"Admin",
                     "old":"89dc2302d644609526f8bee192df43e3",
@@ -432,7 +441,7 @@ def resetPw(p_dict,p_rtn):
                   }
     :param p_rtn:
     :return:
-    '''
+    """
     try:
         user = User.objects.get(username=p_dict['username'])
         if user.pw != p_dict['old']:
@@ -453,12 +462,12 @@ def resetPw(p_dict,p_rtn):
             "rtnCode":-1
         })
 def getArticleTypesByKind(p_dict,p_rtn):
-    '''
+    """
     模糊查询kind值，返回ArticleType数组
     :param p_dict: {kind:['',''],parentId:xxx}
     :param p_rtn:
     :return:
-    '''
+    """
     p_set = set(p_dict.keys())
     p_checkset = set(['kind','parentId'])
     if p_set != p_checkset:
@@ -485,7 +494,7 @@ def getArticleTypesByKind(p_dict,p_rtn):
         }
     })
 def getArticlesByKind(p_dict,p_rtn):
-    '''
+    """
     模糊查询kind值，返回Article数组
     :param p_dict: {kind:['',''],parentId:xxx,id:xxx,
                     location: { pageCurrent: 1, pageRows: 10, pageTotal: 0},
@@ -494,7 +503,7 @@ def getArticlesByKind(p_dict,p_rtn):
                     }
     :param p_rtn:
     :return:
-    '''
+    """
     p_set = set(p_dict.keys())
     p_checkset = set(['kind','parentId','id','location','parentKind'])
     if p_set != p_checkset:
@@ -637,9 +646,9 @@ def ueditorController(request):
     return get_ueditor_controller(request)
 
 def rawsql4rtn(aSql):
-    '''
+    """
         根据sql语句，返回数据和记录总数。.
-    '''
+    """
     l_cur = connection.cursor()
     l_rtn = {"error":"",
             "rtnInfo": "成功",

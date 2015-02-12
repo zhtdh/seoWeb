@@ -1,14 +1,14 @@
 from django.db import models
-from django.db.models import DO_NOTHING,CASCADE,SET_NULL
+from django.db.models import CASCADE,SET_NULL
 import datetime
 # Create your models here.
 
 BoolCharacter=(('Y','是'),('N','否'))
-# kindType=(('corpInfo','公司简介'),
-#           ('topContact','联系我们'),
-#           ('topApp','应用'),
-#           ('topCase','案例'),
-#           ('topContact','行业'))
+# kindType=((',corpInfo,','公司简介'),
+#           (',topContact,','联系我们'),
+#           (',topApp,','应用'),
+#           (',topCase,','案例'),
+#           (',topContact,','行业'))
 class BaseModel(models.Model):
     ''''''
     recname = models.CharField('创建人员',max_length=32,blank=True,null=True)
@@ -62,7 +62,7 @@ class User(BaseModel):
     def __str__(self):
         return self.username
     class Meta:
-        db_table = 'User'
+        db_table = 'USER'
 class ArticleType(BaseModel):
     id = models.CharField('pk',primary_key=True,max_length=32)
     parent = models.ForeignKey('ArticleType',verbose_name='父类型', \
@@ -70,22 +70,28 @@ class ArticleType(BaseModel):
                                blank=True,null=True)
     kind = models.CharField('内部类型名称',max_length=100,blank=True,null=True)
     title = models.CharField('标题',max_length=100,blank=True,null=True)
-    link = models.CharField('链接',max_length=100,blank=True,null=True)
+    link = models.CharField('链接',max_length=200,blank=True,null=True)
+    exorder = models.IntegerField('排序',blank=True,null=True)
+    exlink = models.CharField('扩展链接',max_length=200,blank=True,null=True)
+    extitle = models.TextField('扩展内容')
     def __str__(self):
         return self.title
     class Meta:
-        db_table = 'ArticleType'
+        db_table = 'ARTICLETYPE'
 class Article(BaseModel):
-    id = models.CharField('pk',primary_key=True,max_length=32)
+    id = models.CharField('pk',primary_key=True,max_length=32,db_index=True)
     parent = models.ForeignKey('ArticleType', \
-        verbose_name='文章类型',related_name='article',db_column='parent_id', \
-        on_delete=SET_NULL,blank=True,null=True)
+        verbose_name='文章类型',related_name='fk_article',db_column='parent_id', \
+        on_delete=SET_NULL,blank=True,null=True,db_index=True)
     kind = models.CharField('内部类型名称',max_length=100,blank=True,null=True)
     title = models.CharField('标题',max_length=100)
     content = models.TextField('内容')
     imglink = models.CharField('标题图片链接',max_length=100,blank=True,null=True)
     videolink = models.CharField('视频链接',max_length=100,blank=True,null=True)
+    exorder = models.IntegerField('排序',blank=True,null=True)
+    link = models.CharField('链接',max_length=200,blank=True,null=True)
+    exlink = models.CharField('扩展链接',max_length=200,blank=True,null=True)
     def __str__(self):
         return self.title
     class Meta:
-        db_table = 'Article'
+        db_table = 'ARTICLE'
