@@ -13,6 +13,7 @@ class BaseModel(models.Model):
     ''''''
     recname = models.CharField('创建人员',max_length=32,blank=True,null=True)
     rectime = models.CharField('创建时间',max_length=19,blank=True,null=True)
+    updtime = models.CharField('更新时间',max_length=19,blank=True,null=True)
     remark = models.CharField('备注',blank=True,max_length=50,null=True)
     def __getitem__(self,k):
         return self.__getattribute__(k)
@@ -36,7 +37,7 @@ class BaseModel(models.Model):
             else:
                 raise Exception("日期型参数错误")
         else:
-            self.__setattr__(key,value)
+            self.__setattr__(key, value)
     def clientToServerDataTrans(self):
         '''字段值转换'''
         for colModel in self._meta.local_fields:
@@ -74,6 +75,7 @@ class ArticleType(BaseModel):
     exorder = models.IntegerField('排序',blank=True,null=True)
     exlink = models.CharField('扩展链接',max_length=200,blank=True,null=True)
     extitle = models.TextField('扩展内容')
+    exkind = models.CharField('类型标识2',max_length=100,blank=True,null=True)
     def __str__(self):
         return self.title
     class Meta:
@@ -91,6 +93,7 @@ class Article(BaseModel):
     exorder = models.IntegerField('排序',blank=True,null=True)
     link = models.CharField('链接',max_length=200,blank=True,null=True)
     exlink = models.CharField('扩展链接',max_length=200,blank=True,null=True)
+    exkind = models.CharField('类型标识2',max_length=100,blank=True,null=True)
     def __str__(self):
         return self.title
     class Meta:

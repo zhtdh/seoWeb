@@ -2,9 +2,19 @@
 ====================================================================
 表column: id, parentid, kind, title, link. ordernum.
 + exorder
+exlink
+extitle
+rectime, recname, updtime
+exkind
+
 
 表article: id, parentid, title, content, imglink, videolink, recname, rectime.
 + exorder
+    exorder = models.IntegerField('排序',blank=True,null=True)
+    link = models.CharField('链接',max_length=200,blank=True,null=True)
+    exlink = models.CharField('扩展链接',max_length=200,blank=True,null=True)
+exkind
+
 
 表user:    username, pw.
 =====================================================================
