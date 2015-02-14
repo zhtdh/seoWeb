@@ -130,13 +130,12 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
     };
     lp.newSubItem = function (aNode) {
       var nodeData = aNode.$modelValue;
-      if (aNode.collapsed) {
-        console.log('colapsed.');
+      if (aNode.collapsed) { // console.log('when insert into a colapsed node, should expand it.');
         aNode.expand();
       }
       nodeData.items.push({
         id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
-        parentId: nodeData.id,
+        parent_id: nodeData.id,
         title: '新节点', // nodeData.title + '.' + (nodeData.items.length + 1),
         state: lp.treeState.new,
         ex_parm: {},
@@ -157,7 +156,10 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
     lp.saveTree = function(){
       blacAccess.setAdminColumn( lp.treeData[0]).then(
         function (data) {
-          if (data.rtnCode == 1) console.log('save ok. ');
+          if (data.rtnCode == 1) {
+            console.log('save ok. ');
+            initColumDefTree();
+          }
           else console.log(data);
         },
         function (data) {
@@ -219,7 +221,7 @@ app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,
   };
   lp.editArticle = function(aArg){
     if (aArg == -1 ) {  // 在当前的父栏目下面增加新的内容。
-      lp.singArticle = {state:"new", id: blacUtil.createUUID(), parentid:lColumnId, kind:"", title:"", content:"", imglink:"", videolink:"", recname:"", rectime:""};
+      lp.singArticle = {state:"new", id: blacUtil.createUUID(), parent_id:lColumnId, kind:"", title:"", content:"", imglink:"", videolink:"", recname:"", rectime:""};
       UE.getEditor(lEditorId).setContent('');
     }
     else {  // 根据点击的articleID，搞到他的内容。

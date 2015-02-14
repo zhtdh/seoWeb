@@ -17,6 +17,7 @@ class ServerToClientJsonEncoder(json.JSONEncoder):
             return float(obj)
         else:
             return json.JSONEncoder.default(self,obj)
+
 class AppException(Exception):
     pass
 
