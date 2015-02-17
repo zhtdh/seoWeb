@@ -6,30 +6,16 @@ from django.db.utils import IntegrityError, DatabaseError
 from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
-from App.utils import log, AppException, logErr
+from App.utils import *
 from App.models import *
 from App.ueditor.views import get_ueditor_controller
-
 
 def test1(request):
   return render(request, "App/test.html")
 
-
-def paramCheck(standard_set, target_set, check_type):
-  """
-    检查参数是否合法
-    :param standard_set:标准set
-    :param target_set: 检验set
-    :param check_type: ("in","not", "intersec")
-    :return:
-  """
-
-
 def getPageRowNo(p_dict):
-  """
-    返回分页firstRow,lastRow
-    :param p_dict: {pageCurrent:当前页, pageRows:一页的行数,pageTotal: 0}
-    :return: (firstRowNo,lastRowNo)
+  """usage:  getPageRowNo( {pageCurrent:当前页, pageRows:一页的行数, pageTotal: 0} )
+    :return: (firstRowNo,lastRowNo, rowTotal)
     """
   if 'pageCurrent' not in p_dict or 'pageRows' not in p_dict or 'pageTotal' not in p_dict:
     raise AppException('上传分页参数错误')
@@ -45,178 +31,83 @@ def getPageRowNo(p_dict):
     row_total = -1
   return first_row, last_row, row_total
 
-
 def logon(session, p_user, p_rtn):
-  """
-    :param session:
-    :param p_user: { md5: "6547436690a26a399603a7096e876a2d"
-                                           username: "aaa" }
-    :param p_rtn:
-    :return:
-    """
+  """usage: logon(request.session, { md5: "xx",username: "aaa" }, rtn) """
   ls_name = p_user['username']
   ls_pw = p_user['md5']
   try:
     user = User.objects.get(username=ls_name)
     if user.pw == ls_pw:
       session['username'] = ls_name
-      p_rtn.update({"rtnInfo": "登录成功",
-                    "rtnCode": 1
-      })
+      p_rtn.update({"rtnInfo": "登录成功", "rtnCode": 1 })
     else:
       session["username"] = None
-      p_rtn.update({"rtnInfo": "密码错误",
-                    "rtnCode": -1
-      })
+      p_rtn.update({"rtnInfo": "密码错误", "rtnCode": -1  })
   except ObjectDoesNotExist:
-    p_rtn.update({"rtnInfo": "用户不存在",
-                  "rtnCode": -1
-    })
-
+    p_rtn.update({"rtnInfo": "用户不存在", "rtnCode": -1  })
 
 def saveArticleType(p_AType):
+  if {'id', 'parent_id'} & set(p_AType.keys()) != {'id', 'parent_id'}:
+        raise AppException('栏目缺少必要字段' + str(p_AType.keys()))
 
-  if 'state' not in p_AType:
+  if '_exState' not in p_AType:
     pass
-  elif p_AType['state'] == 'new': # 添加新的栏目数据
-    if {'id', 'parent_id', 'title', 'ex_parm'} & set(p_AType.keys()) != {'id', 'parent_id', 'title', 'ex_parm'}:
-        raise AppException('栏目缺少必要字段' + str(p_AType.keys()))
-    newType = ArticleType(id=p_AType['id'], parent_id=str(p_AType['parent_id']), title=p_AType['title'])
-    for i in p_AType['ex_parm'].keys():
-      newType[i] = p_AType['ex_parm'][i]
+  elif p_AType['_exState'] == 'new': # 添加新的栏目数据
+    newType = ArticleType()
+    for i in g_type_fields:
+      newType[i] = p_AType[i]
     newType.save()
-  elif p_AType['state'] == 'dirty':  # 更新数据
-    if {'id', 'parent_id', 'ex_parm'} & set(p_AType.keys()) != {'id', 'parent_id', 'ex_parm'}:
-        raise AppException('栏目缺少必要字段' + str(p_AType.keys()))
-
+  elif p_AType['_exState'] == 'dirty':  # 更新数据
     oldType = ArticleType.objects.get(id=p_AType['id'])
-
     changed_field = []
-    for i in ['parent_id', 'title']:
-      if oldType[i] != p_AType[i]:
-        oldType[i] = p_AType[i]
-        changed_field.append(i)
-    for i in p_AType['ex_parm'].keys():
+    for i in g_type_fields:
       if oldType[i] != str(p_AType[i]):
         oldType[i] = p_AType[i]
         changed_field.append(i)
-    """
-    if ('parent_id' in p_AType) and (oldType.parent_id != str(p_AType['parent_id'])):
-      oldType.parent_id = str(p_AType['parent_id'])
-    if ('title' in p_AType) and (oldType.title != p_AType['title']):
-      oldType.title = p_AType['title']
-    if 'ex_parm' in p_AType:
-      if 'kind' in p_AType['ex_parm']:
-        if oldType.kind != p_AType['ex_parm']['kind']:
-          oldType.kind = p_AType['ex_parm']['kind']
-      if 'link' in p_AType['ex_parm']:
-        if oldType.link != p_AType['ex_parm']['link']:
-          oldType.link = p_AType['ex_parm']['link']
-    """
     oldType.save(update_fields=changed_field)
-    print(connection.queries)
-  elif p_AType['state'] == 'clean':
+  elif p_AType['_exState'] == 'clean':
     pass
   else:
-    raise AppException('类型修改state非法!')
-
+    raise AppException('state参数非法!')
+  if 'items' in p_AType:
+    for i in p_AType['items']:
+      saveArticleType(i)
 
 def dealArticleType(p_dict, p_rtn):
+  """ usage: dealArticleType(  { "id": 0, "title": "根","items": [{..
+              "_exState": "clean",  # new：生成insert，dirty：生成update，clean：忽略。
+              "items": []  } ... ], "deleteId": [xxx, xxx]  }, rtn)
   """
-    :param p_dict = {
-        "id": 0,
-        "title": "根",
-        "items": [
-          {
-            "id": "C67743685CF00001FFEB15602B167D",
-            "parent_id": 0,
-            "title": "新节点1",
-            "state": "clean",
-            "ex_parm": { kind:"", link:"", exorder extitle exlink exkind},
-            "items": []
-          }],
-        "deleteId": [xxx, xxx]
-      }
-      state说明：
-              new：生成insert，
-              dirty：生成update语句。
-              clean：不用
-    :param p_rtn: 返回结构
-    :return:
-    """
-
   if 'deleteId' in p_dict:
     if len(p_dict['deleteId']) > 0:
       ArticleType.objects.filter(id__in=p_dict['deleteId']).delete()
-
-
-  if 'items' in p_dict:
-    for item in p_dict['items']:
-      saveArticleType(item)
-
-  p_rtn.update({
-    "alertType": 1,
-    "error": [],
-    "rtnInfo": "成功",
-    "rtnCode": 1
-  })
-
+  saveArticleType(p_dict)
+  p_rtn.update(genRtnOk("保存栏目成功。"))
 
 def getArticleType(p_rtn):
-  """
-    返回全部ArticleType
-    :param p_rtn:
-    :return:
-    """
-  l_rtn = {}
+  """   返回全部ArticleType """
+  l_rtn = {'id': '0','parent_id':None,'title': '根','items': []}
   try:
-    root = ArticleType.objects.get(id='0')
-    l_rtn.update({
-      'id': '0',
-      'parent_id': None,
-      'title': '根',
-      'items': []
-    })
     getSubArticleType('0', l_rtn['items'])
-    p_rtn.update({
-      "rtnInfo": "查询成功",
-      "rtnCode": 1,
-      "exObj": {
-        "columnTree": l_rtn
-      }
-    })
+    p_rtn.update( genRtnOk("查询栏目成功。") )
+    p_rtn.update({"exObj": { "columnTree": l_rtn }})
   except ObjectDoesNotExist:
-    p_rtn.update({
-      "rtnInfo": "根不存在",
-      "rtnCode": -1
-    })
-
+    p_rtn.update(genRtnFail(None, "根不存在"))
 
 def getSubArticleType(p_parent_id, p_items):
-  a_type = ArticleType.objects.filter(parent_id=p_parent_id)
+  a_type = ArticleType.objects.filter(parent_id=p_parent_id).values() # 转化为dict{}
   for t in a_type:
     items = []
-    getSubArticleType(t.id, items)
-    p_items.append({
-      'id': t.id,
-      'parent_id': t.parent_id,
-      'title': t.title,
-      'ex_parm': {
-        'link': t.link,
-        'kind': t.kind
-      },
-      'items': items
-    })
-
+    getSubArticleType(t['id'], items)
+    l_tmp = {'items': items}
+    t.update(l_tmp)
+    p_items.append(t)
 
 def getArticleList(p_dict, p_rtn):
-  """
-    :param p_dict:{
+  """ usage: getArticleList( {
         location: { pageCurrent:当前页, pageRows:一页的行数,pageTotal:共有多少页 },
-        columnId:'xxx'
-     }
-    :return:
-    """
+        columnId:'xxx'  }, rtn)
+  """
   if 'columnId' not in p_dict or 'location' not in p_dict:
     raise AppException('上传参数错误')
   firstRow, lastRow, rowTotal = getPageRowNo(p_dict['location'])
@@ -226,141 +117,61 @@ def getArticleList(p_dict, p_rtn):
     total = Article.objects.filter(parent_id=p_dict['columnId']).count()
   else:
     total = -1
-  p_rtn.update({
-    "alertType": 1,
-    "error": [],
-    "rtnInfo": "成功",
-    "rtnCode": 1,
-    "exObj": {
-      "rowCount": total,
-      "contentList": articles
-    }
-  })
-
+  p_rtn.update(genRtnOk("查询文章列表成功。") )
+  p_rtn.update({ "exObj": {  "rowCount": total,  "contentList": articles } })
 
 def getArticle(p_dict, p_rtn):
-  """
-    查询指定article
-    :param p_dict: { articleId: xxx }
-    :param p_rtn:
-    :return:
-    """
+  """ usage: getArticle( { articleId: xxx } , p_rtn ) """
   if 'articleId' not in p_dict:
     raise AppException('上传参数错误')
   try:
-    article = Article.objects.get(id=p_dict['articleId'])
-    p_rtn.update({
-      "rtnInfo": "成功",
-      "rtnCode": 1,
-      "exObj": {
-        "article": {
-          "id": article.id,
-          "parent_id": article.parent_id,
-          "kind": article.kind,
-          "title": article.title,
-          "content": article.content,
-          "imglink": article.imglink,
-          "videolink": article.videolink,
-          "recname": article.recname,
-          "rectime": article.rectime
-        }
-      }
-    })
+    article = Article.objects.filter(id=p_dict['articleId']).values()[0]
+    p_rtn.update(genRtnOk("查询文章成功。"))
+    p_rtn.update({"exObj": {"article": article }} )
   except ObjectDoesNotExist:
-    p_rtn.update({
-      "rtnInfo": "失败",
-      "rtnCode": -1
-    })
+    p_rtn.update(genRtnFail(None, "查询文章失败"))
 
+def setArticle(p_dict, p_rtn, request):
+  if "article" not in p_dict and '_exState' not in p_dict['article']:
+    raise AppException('上传参数错误，缺少article的关键字段')
+  l_art = p_dict['article']
 
-def setArticle(p_dict, p_rtn, session):
-  """
-    增删改Article
-    :param p_dict:{ article:{
-                        state:"new",
-                        id: 'xxxxx',
-                        parent_id:0,
-                        kind:"",
-                        title:"",
-                        content:"",
-                        imglink:"",
-                        videolink:"",
-                        recname:"",
-                        rectime:""
-                    }
-                 }
-        state说明：
-              new：生成insert，
-              dirty：生成update语句。
-              clean：不用
-    :param p_rtn:
-    :return:
-    """
-  if "article" not in p_dict:
-    raise AppException('上传参数错误')
-  p_article = p_dict['article'].copy()
-  if 'state' not in p_article:
-    raise AppException('上传参数错误')
-  p_article.update({
-    'parent_id': p_article['parent_id']
-  })
-  del p_article['parent_id']
-  state = p_article['state']
-  del p_article['state']
-  if state == 'new':
-    p_article.update({
-      "recname": session["username"],
-      "rectime": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    })
-    new_article = Article(**p_article)
-    new_article.save()
-  elif state == 'dirty':
-    if session['username'] == p_article['recname'] or session['username'] == 'Admin':
-      id = p_article['id']
-      del p_article['id']
-      del p_article['recname']
-      del p_article['rectime']
-      Article.objects.filter(id=id).update(**p_article)
+  if l_art['_exState'] == 'new':
+    recArt = Article()
+  elif l_art['_exState'] == 'dirty':
+    recArt = Article.objects.filter(id=l_art['id'])
+  for i in g_article_fields:
+    if i not in ('recname', 'rectime') and i in l_art: # 传递过来的参数。
+      recArt[i] = l_art[i]
+  recArt["rectime"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+  if l_art['_exState'] == 'new':
+    recArt["recname"] = request.session["username"]
+    recArt.save()
+    p_rtn.update(genRtnOk("新纪录保存成功"))
+  elif l_art['_exState'] == 'dirty':
+    if request.session['username'] == recArt['recname'] or request.session['username'] == 'Admin':
+      recArt.save()
+      p_rtn.update(genRtnOk("纪录保存成功"))
     else:
-      p_rtn.update({
-        "rtnInfo": "非本人发布，不能修改",
-        "rtnCode": -1
-      })
-  elif state == 'clean':
-    pass
+       p_rtn.update(genRtnFail(request, "非本人记录不能更改。"))
+  elif l_art['_exState'] == 'clean':
+    p_rtn.update(genRtnOk("没有需要保存的文章"))
   else:
     raise AppException('上传参数错误')
-  p_rtn.update({
-    "rtnInfo": "成功",
-    "rtnCode": 1
-  })
 
-
-def deleteArticle(p_dict, p_rtn, session):
+def deleteArticle(p_dict, p_rtn, request):
   if 'articleId' not in p_dict:
     raise AppException('上传参数错误')
   old_article = Article.objects.get(id=p_dict['articleId'])
-  if session['username'] == old_article.recname or session['username'] == 'Admin':
+  if request.session['username'] == old_article.recname or request.session['username'] == 'Admin':
     old_article.delete()
-    p_rtn.update({
-      "rtnInfo": "成功",
-      "rtnCode": 1
-    })
+    p_rtn.update(genRtnOk("删除成功"))
   else:
-    p_rtn.update({
-      "rtnInfo": "非本人发布，不能删除",
-      "rtnCode": -1
-    })
-
+    p_rtn.update(genRtnFail(request, "非本人记录不能更改。"))
 
 def setUser(p_dict, p_rtn, session):
-  """
-    维护User
-    :param p_dict: { state:"new", username: xxx , pw : xxx, oldWord: xxx}
-    :param p_rtn:
-    :return:
-    """
-  # p_dict = p_dict['user']
+  """usage:  setuser ( { state:"new", username: xxx , pw : xxx, oldWord: xxx}, xx, x)  """
   p_set = set(p_dict.keys())
   p_checkset = set(['_exState', 'username', 'pw'])
   if p_set != p_checkset:
@@ -376,113 +187,50 @@ def setUser(p_dict, p_rtn, session):
           old_u.pw = p_dict['pw']
           old_u.save(force_update=True, update_fields=['pw'])
         else:
-          p_rtn.update({
-            "rtnInfo": "失败，旧密码错误",
-            "rtnCode": -1
-          })
+          p_rtn.update(genRtnFail(None, "旧密码错误！"))
       elif p_dict['_exState'] == 'clean':
         pass
       else:
         raise AppException('上传参数错误')
-      p_rtn.update({
-        "rtnInfo": "成功",
-        "rtnCode": 1
-      })
+      p_rtn.update(genRtnOk("保存成功"))
     except IntegrityError:
-      p_rtn.update({
-        "rtnInfo": "用户名重复，增加失败！",
-        "rtnCode": -1
-      })
+      p_rtn.update(genRtnFail(None, "用户名重复，增加失败！"))
     except DatabaseError:
-      p_rtn.update({
-        "rtnInfo": "用户不存在，修改失败！",
-        "rtnCode": -1
-      })
+      p_rtn.update(genRtnFail(None, "用户不存在，修改失败"))
   else:
-    p_rtn.update({
-      "rtnInfo": "非管理员不能维护用户",
-      "rtnCode": -1
-    })
-
+    p_rtn.update(genRtnFail(None, "非管理员不能维护用户"))
 
 def deleteUser(p_dict, p_rtn, session):
-  """
-    删除user
-    :param p_dict: { username: xxx }
-    :param p_rtn:
-    :param session:
-    :return:
-    """
   if 'username' not in p_dict:
     raise AppException('上传参数错误')
   if session['username'] == 'Admin':
     User.objects.filter(username=p_dict['username']).delete()
-    p_rtn.update({
-      "rtnInfo": "成功",
-      "rtnCode": 1
-    })
+    p_rtn.update(genRtnOk("保存成功"))
   else:
-    p_rtn.update({
-      "rtnInfo": "非管理员不能删除用户",
-      "rtnCode": -1
-    })
-
+    p_rtn.update(genRtnFail(None, "非管理员不能删除用户。"))
 
 def getUserList(p_dict, p_rtn):
-  """
-    :param p_dict:{
-        pageCurrent:当前页, pageRows:一页的行数,pageTotal:共有多少页
-     }
-    :return:
-    """
-
   firstRow, lastRow, rowTotal = getPageRowNo(p_dict)
   users = list(User.objects.exclude(username__exact='Admin').order_by('username').values('username')[firstRow:lastRow])
   if rowTotal == 0:
     total = User.objects.all().count()
   else:
     total = -1
-  p_rtn.update({
-    "alertType": 1,
-    "error": [],
-    "rtnInfo": "成功",
-    "rtnCode": 1,
-    "exObj": {
-      "rowCount": total,
-      "userList": users
-    }
-  })
-
+  p_rtn.update(genRtnOk("保存成功"))
+  p_rtn.update({"exObj": {  "rowCount": total,   "userList": users }})
 
 def resetPw(p_dict, p_rtn):
-  """
-    修改用户密码
-    :param p_dict:{ "username":"Admin",
-                    "old":"89dc2302d644609526f8bee192df43e3",
-                    "new":"0977648895559d3a4420c397bc6cf98d"
-                  }
-    :param p_rtn:
-    :return:
-    """
+  """ resetPw({ "username":"Admin","old":"xxx", "new":"xxx" }, p_rtn)  """
   try:
     user = User.objects.get(username=p_dict['username'])
     if user.pw != p_dict['old']:
-      p_rtn.update({
-        "rtnInfo": "密码错误",
-        "rtnCode": -1
-      })
+      p_rtn.update(genRtnFail(None, "密码错误"))
     else:
       user.pw = p_dict['new']
       user.save(update_fields=['pw'])
-      p_rtn.update({
-        "rtnInfo": "成功",
-        "rtnCode": 1
-      })
+      p_rtn.update(genRtnOk("更新成功"))
   except ObjectDoesNotExist:
-    p_rtn.update({
-      "rtnInfo": "用户名错误",
-      "rtnCode": -1
-    })
+    p_rtn.update(genRtnFail(None, "用户名错误"))
 
 
 def getArticleTypesByKind(p_dict, p_rtn):
@@ -551,7 +299,6 @@ def getArticlesByKind(p_dict, p_rtn):
       artKindReg = '('
       for p in p_dict['kind']:
         artKindReg = artKindReg + p + '|'
-      # pattern = len(pattern) == 1 and '()' or pattern[0:-1] + ')'
       artKindReg = artKindReg[0:-1] + ')'
       r = r.filter(kind_regex=artKindReg)
     if len(p_dict['parentKind']) > 0:
@@ -580,13 +327,7 @@ def getArticlesByKind(p_dict, p_rtn):
 
 
 def dealREST(request):
-  l_rtn = {"alertType": 0,
-           "error": [],
-           "rtnInfo": "",
-           "rtnCode": -1,
-           "exObj": {}
-  }
-
+  l_rtn = genRtnOk("执行成功")
   try:
     ldict = json.loads(request.POST['jpargs'])
 
@@ -597,15 +338,6 @@ def dealREST(request):
       if ldict['func'] == 'userlogin':
         logon(request.session, ldict['ex_parm']['user'], l_rtn)
       else:
-        # if ('username' not in request.session or request.session['username'] == None):
-        # return HttpResponse(json.dumps({
-        # "rtnCode":0,
-        #         "rtnInfo":"登录不成功",
-        #         "alertType":0,
-        #         "error":[],
-        #         "exObj":{},
-        #         "appendOper": "login"
-        #     },ensure_ascii=False), content_type="application/javascript")
         if ldict['func'] == 'setAdminColumn':
           dealArticleType(ldict['ex_parm']['columnTree'], l_rtn)
         elif ldict['func'] == 'getAdminColumn':
@@ -615,7 +347,7 @@ def dealREST(request):
         elif ldict['func'] == 'getArticleCont':
           getArticle(ldict['ex_parm'], l_rtn)
         elif ldict['func'] == 'setArticleCont':
-          setArticle(ldict['ex_parm'], l_rtn, request.session)
+          setArticle(ldict['ex_parm'], l_rtn, request)
         elif ldict['func'] == 'deleteArticleCont':
           deleteArticle(ldict['ex_parm'], l_rtn, request.session)
         elif ldict['func'] == 'setUserCont':
@@ -631,37 +363,23 @@ def dealREST(request):
         elif ldict['func'] == 'getForeArt':
           getArticlesByKind(ldict['ex_parm'], l_rtn)
         elif ldict['func'] == 'extools':
-          l_rtn = rawsql4rtn(ldict['ex_parm']['sql']);
+          l_rtn = rawsql4rtn(ldict['ex_parm']['sql'])
         else:
-          l_rtn.update({
-            "rtnInfo": "功能错误",
-            "rtnCode": -1
-          })
+          l_rtn.update(genRtnFail(None, "功能错误"))
   except AppException as e:
-    l_rtn = {
-      "alertType": 0,
-      "error": [],
-      "rtnInfo": str(e),
-      "rtnCode": -1,
-      "exObj": {}
-    }
+    l_rtn = genRtnFail(None, e.args)
+    raise e
   except Exception as e:
     log("ajaxResp.dealPAjax执行错误：%s" % str(e.args))
-    l_rtn = {
-      "alertType": 0,
-      "error": e.args,
-      "rtnInfo": "服务器端错误",
-      "rtnCode": -1,
-      "exObj": {}
-    }
+    l_rtn = genRtnFail(None, "服务器端错误。")
+    raise e
   finally:
     for q in connection.queries:
       log(q)
-  return ( HttpResponse(json.dumps(l_rtn, ensure_ascii=False)))
-
+  return HttpResponse(json.dumps(l_rtn, ensure_ascii=False))
 
 def ueditorController(request):
-  if ('username' not in request.session or request.session['username'] == None):
+  if 'username' not in request.session or request.session['username'] is None:
     return HttpResponse(json.dumps({
                                      "rtnCode": 0,
                                      "rtnInfo": "登录不成功",
@@ -674,14 +392,9 @@ def ueditorController(request):
 
 
 def rawsql4rtn(aSql):
-  """
-        根据sql语句，返回数据和记录总数。.
-    """
+  """  根据sql语句，返回数据和记录总数。  """
   l_cur = connection.cursor()
-  l_rtn = {"error": "",
-           "rtnInfo": "成功",
-           "rtnCode": 1,
-           "exObj": {}}
+  l_rtn = genRtnOk("执行成功")
   l_sum = []
   try:
     log(aSql)
@@ -690,7 +403,6 @@ def rawsql4rtn(aSql):
       l_sum.append(i)
   except Exception as e:
     logErr("查询失败：%s" % str(e.args))
-    raise e
   finally:
     l_cur.close()
   l_rtn.update({"exObj": l_sum})

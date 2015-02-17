@@ -43,6 +43,35 @@ def logErr(aMsg, alogFile = BASE_DIR + 'err.log'):
     #a.close()
     # if os.path.exists(alogFile): raise Exception("our system log file does not exist") 直接写。
 
+# push a Err msg into sessions . and return to client. usage: logErrReq(request, 'err msg') :  l_rtn = genRtnFail(request, "消息处理过程错误")
+def logErrReq(aReq, aMsg):
+  aReq.session["lastErr"].append(aMsg)
+  logErr(aMsg)
+
+
+def genRtn(aCode=1, aInfo="", aAlert=0, aErr=[], aObj={}):
+  return {"rtnCode":aCode, "rtnInfo":aInfo, "alertType":aAlert, "error":aErr, "exObj":aObj}
+
+def genRtnOk(aInfo):
+  return {"rtnCode":1, "rtnInfo":aInfo, "alertType":0, "error":[], "exObj":{}}
+
+def genRtnFail(aReq, aInfo, aAlert=0):
+  if aReq:
+    return {"rtnCode":-1, "rtnInfo":aInfo, "alertType":0, "error":aReq.session["lastErr"]}
+  else:
+    return {"rtnCode":-1, "rtnInfo":aInfo, "alertType":0, "error":["未知错误"]}
+
+
+
+from App.models import ArticleType,Article
+
+g_type_fields = ArticleType._meta.get_all_field_names()
+g_type_fields.remove('fk_article')
+g_type_fields.remove('parent')
+g_type_fields.remove('subarticletype')
+
+g_article_fields = Article._meta.get_all_field_names()
+g_article_fields.remove('parent')
 
 
 '''

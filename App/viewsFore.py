@@ -6,7 +6,6 @@ from django.views.decorators.http import *
 from App.utils import log
 from App.models import Article
 
-
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
     try:
@@ -36,6 +35,7 @@ def getCorpInfo():
             .filter(kind__icontains='corpinfo').values('content')[0]['content']
     except IndexError:
         return "无简介"
+
 def getContact():
     try:
         return Article.objects.filter(parent_id='0')\

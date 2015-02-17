@@ -104,7 +104,6 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
   // 后台管理端：栏目设置。
   {
     lp.treeData = [{"id":0,"title":"根","items":[], deleteId:[]}];
-    lp.treeState = blacAccess.dataState;
     lp.wrapConfirm = blacUtil.wrapConfirm;
 
     lp.initColumDefTree = function() {
@@ -120,7 +119,7 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
       var nodeData = aNode.$modelValue;
       if (nodeData.id == 0) return;
       if (window.confirm("确认删除他和所有的子记录么？"))
-        if (nodeData.state == lp.treeState.new)
+        if (blacAccess.getDataState(nodeData) == blacAccess.dataState.new)
           aNode.remove();
         else {
           lp.treeData[0].deleteId.push(nodeData.id);
@@ -132,15 +131,14 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
       var nodeData = aNode.$modelValue;
       if (aNode.collapsed) { // console.log('when insert into a colapsed node, should expand it.');
         aNode.expand();
-      }
-      nodeData.items.push({
-        id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
+      };
+      var l_tmp = { id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
         parent_id: nodeData.id,
         title: '新节点', // nodeData.title + '.' + (nodeData.items.length + 1),
-        state: lp.treeState.new,
-        ex_parm: {},
         items: []
-      });
+      };
+      blacAccess.setDataState(l_tmp, blacAccess.dataState.new);
+      nodeData.items.push(l_tmp);
     };
     lp.nodeClick = function (aNode) {
       if (aNode.$modelValue.id == 0) return;
@@ -148,7 +146,7 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
       $location.path('/acadmin/selflist/' + lp.clickNode.id);
     };
     lp.nodeTitleChanged = function (aCurNode) {
-      if (aCurNode.state != lp.treeState.new) aCurNode.state = lp.treeState.dirty;
+      if (blacAccess.getDataState(aCurNode) != blacAccess.dataState.new) blacAccess.setDataState(aCurNode, blacAccess.dataState.dirty);
     };
     lp.treeExpandAll = function(){
       angular.element(document.getElementById("tree-root")).scope().expandAll();
@@ -158,7 +156,7 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$h
         function (data) {
           if (data.rtnCode == 1) {
             console.log('save ok. ');
-            initColumDefTree();
+            lp.initColumDefTree();
           }
           else console.log(data);
         },
@@ -221,7 +219,8 @@ app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,
   };
   lp.editArticle = function(aArg){
     if (aArg == -1 ) {  // 在当前的父栏目下面增加新的内容。
-      lp.singArticle = {state:"new", id: blacUtil.createUUID(), parent_id:lColumnId, kind:"", title:"", content:"", imglink:"", videolink:"", recname:"", rectime:""};
+      lp.singArticle = {id: blacUtil.createUUID(), parent_id:lColumnId, kind:"", title:"", content:"", imglink:"", videolink:"", recname:"", rectime:""};
+      blacAccess.setDataState(lp.singArticle, blacAccess.dataState.new);
       UE.getEditor(lEditorId).setContent('');
     }
     else {  // 根据点击的articleID，搞到他的内容。
@@ -242,14 +241,14 @@ app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,
     // 远程保存成功否？
 
     lp.singArticle.content = UE.getEditor(lEditorId).getContent(); // 获得uEditor的内容。保存到数据字段。
-    if (lp.singArticle.state != blacAccess.dataState.new) lp.singArticle.state = blacAccess.dataState.dirty; // 设置保存。
+    if (blacAccess.getDataState(lp.singArticle) != blacAccess.dataState.new) blacAccess.setDataState(lp.singArticle, blacAccess.dataState.dirty);// 设置保存。
 
     blacAccess.setArticleCont(lp.singArticle).then(
       function(data){
         if (data.rtnCode == 1){
-          if (lp.singArticle.state == blacAccess.dataState.new) {
+          if (blacAccess.getDataState(lp.singArticle) == blacAccess.dataState.new) {
+            blacAccess.setDataState(lp.singArticle, blacAccess.dataState.clean);
             lp.contentList.unshift(lp.singArticle);
-            lp.singArticle.state = blacAccess.dataState.clean;
           }
           else{
             for (i=0;i<lp.contentList.length;i++){
@@ -265,7 +264,7 @@ app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,
     )
   };
   lp.deleteArticle = function(){
-    if (lp.singArticle.state == "new") { // 直接删掉
+    if (blacAccess.getDataState(lp.singArticle) == blacAccess.dataState.new) { // 直接删掉
       lp.singArticle = {};
     }
     else {
@@ -291,6 +290,7 @@ app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,
 });
 app.controller("ctrlAdminListUser", function($scope,blacAccess,blacPage,blacUtil) {
   var lp = $scope;
+  lp.wrapConfirm = blacUtil.wrapConfirm;
   lp.clickContentNode = { id : 0 };  // init;
   // 查询。
   lp.psContentInfo = { pageCurrent: 1, pageRows: 10, pageTotal: 0  }; // init;

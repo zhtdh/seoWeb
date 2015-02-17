@@ -50,7 +50,7 @@
         </div>
         <div class="modal-body">
           {{ singArticle.id }} --
-          {{ singArticle.parentid }}
+          {{ singArticle.parent_id }}
           <form class="form-horizontal" role="form">
             <div class="form-group">
               <label for="inputTitle" class="col-sm-2 control-label">标题：</label>
@@ -62,10 +62,8 @@
             <div class="form-group">
               <label for="inputContent" class="col-sm-2 control-label">内容：</label>
               <div class="col-sm-10">
-
                 <script id="uEditor" type="text/plain" style="width:100%;height:200px;"></script>
-
-                  <textarea ng-model="singArticle.content" id="inputContent" class="form-control" rows="1"></textarea>
+                <textarea ng-model="singArticle.content" id="inputContent" class="form-control" rows="1"></textarea>
               </div>
             </div>
 
@@ -81,16 +79,29 @@
                 <input ng-model="singArticle.imglink" type="text" class="form-control" id="inputImglink" placeholder="http://">
               </div>
             </div>
-            <div class="form-group" ng-hide="true">
-              <label for="inputRecname" class="col-sm-2 control-label">录入人</label>
+
+            <div class="form-group" >
+              <label for="inputLink" class="col-sm-2 control-label">链接</label>
               <div class="col-sm-10">
-                <input ng-model="singArticle.recname" type="text" class="form-control" id="inputRecname" placeholder="record man">
+                <input ng-model="singArticle.link" type="text" class="form-control" id="inputLink" placeholder="链接">
               </div>
             </div>
-            <div class="form-group"  ng-hide="true">
-              <label for="inputRectime" class="col-sm-2 control-label">时间</label>
+            <div class="form-group"  >
+              <label for="inputExorder" class="col-sm-2 control-label">排序号</label>
               <div class="col-sm-10">
-                <input ng-model="singArticle.rectime" type="text" class="form-control" id="inputRectime" placeholder="2010-01-01">
+                <input ng-model="singArticle.exorder" type="text" class="form-control" id="inputExorder" placeholder="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputExlink" class="col-sm-2 control-label">扩展链接</label>
+              <div class="col-sm-10">
+                <input ng-model="singArticle.exlink" type="text" class="form-control" id="inputExlink" placeholder="扩展链接">
+              </div>
+            </div>
+            <div class="form-group" >
+              <label for="inputExkind" class="col-sm-2 control-label">扩展类型</label>
+              <div class="col-sm-10">
+                <input ng-model="singArticle.exkind" type="text" class="form-control" id="inputExkind" placeholder="扩展类型">
               </div>
             </div>
           </form>

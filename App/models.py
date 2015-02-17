@@ -10,12 +10,15 @@ BoolCharacter=(('Y','是'),('N','否'))
 #           (',topCase,','案例'),
 #           (',topContact,','行业'))
 class BaseModel(models.Model):
-    ''''''
-    recname = models.CharField('创建人员',max_length=32,blank=True,null=True)
-    rectime = models.CharField('创建时间',max_length=19,blank=True,null=True)
-    updtime = models.CharField('更新时间',max_length=19,blank=True,null=True)
+    recname = models.CharField('创建人员', max_length=32,blank=True,null=True)
+    rectime = models.CharField('创建时间', max_length=19,blank=True,null=True)
+    updtime = models.CharField('更新时间', max_length=19,blank=True,null=True)
     remark = models.CharField('备注',blank=True,max_length=50,null=True)
-    def __getitem__(self,k):
+
+    def __getitem__(self, k):     #  支持对象直接get属性['title']
+      if isinstance(k,int):        #  serialize成json报错...why?
+        raise Exception("数据库对象参数错误")
+      else:
         return self.__getattribute__(k)
     def __setitem__(self, key, value):
         if value == None:
@@ -38,10 +41,11 @@ class BaseModel(models.Model):
                 raise Exception("日期型参数错误")
         else:
             self.__setattr__(key, value)
+
     def clientToServerDataTrans(self):
         '''字段值转换'''
         for colModel in self._meta.local_fields:
-            if issubclass(type(colModel),models.fields.related.ForeignKey):
+            if issubclass(type(colModel) ,models.fields.related.ForeignKey):
                 if colModel.null == True:
                     if self[colModel.name + '_id'] == '':
                         self[colModel.name] = colModel.get_default()
@@ -80,6 +84,7 @@ class ArticleType(BaseModel):
         return self.title
     class Meta:
         db_table = 'ARTICLETYPE'
+
 class Article(BaseModel):
     id = models.CharField('pk',primary_key=True,max_length=32,db_index=True)
     parent = models.ForeignKey('ArticleType', \
@@ -98,3 +103,4 @@ class Article(BaseModel):
         return self.title
     class Meta:
         db_table = 'ARTICLE'
+
