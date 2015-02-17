@@ -73,6 +73,7 @@ g_type_fields.remove('subarticletype')
 g_article_fields = Article._meta.get_all_field_names()
 g_article_fields.remove('parent')
 
+g_auto_fields = ('recname, rectime, updtime')
 
 '''
 目的：dump任何对象到文件中保存起来。可以load出来。

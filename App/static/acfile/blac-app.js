@@ -76,6 +76,9 @@ app.controller("ctrlAdminTop",function($scope,blacStore,blacAccess) {
   lp.$on(blacAccess.gEvent.broadcast, function(event, aInfo){
     lp.broadInfo = aInfo;
   });
+  lp.logout = function(){
+    lp.loginedUser = null
+  }
 
 });
 app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAccess) {

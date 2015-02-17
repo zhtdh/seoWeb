@@ -4,14 +4,14 @@ from django.shortcuts import render, HttpResponse
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import *
 from App.utils import log
-from App.models import Article
+from App.models import Article, ArticleType
 
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
     try:
         if goolArg == "resec":
             corpInfo = getCorpInfo()
-            return render(request, "rendSec.html",locals())
+            return render(request, "rendSec.html", locals())
         elif goolArg == "rethi":
             return render(request, "rendThi.html")
         elif goolArg == "refou":
@@ -25,16 +25,16 @@ def gool(request, goolArg="", goolSecArg=""):
             return HttpResponseRedirect("/")
     except Exception as e:
         log("gool执行错误：%s" % str(e.args))
+        return HttpResponse("gool执行错误：%s" % str(e.args))
 
 def home(request):
     return render(request, "home.html")
 
 def getCorpInfo():
     try:
-        return Article.objects.filter(parent_id='0')\
-            .filter(kind__icontains='corpinfo').values('content')[0]['content']
+        return ArticleType.objects.filter(kind__icontains=',corpinfo,')[0].fk_article.all()[:1].values()[0]
     except IndexError:
-        return "无简介"
+        return None
 
 def getContact():
     try:

@@ -1,6 +1,6 @@
 {% extends "foreBase.html" %}
 
-{% block title %} 首页标题 {% endblock %}
+{% block title %} {{ corpInfo.title }} {% endblock %}
 
 {% block baseContent %}
 
@@ -59,12 +59,9 @@
 
 
       <div class="block-border-all" style="min-height:600px; width:100%;padding:20px;">
-          <p> 这是一个单页面记录的内容。里面的内容是超文本记录</p>
-          <p>{{ corpInfo }}</p>
-          <p>
-            百度（Nasdaq：BIDU）是全球最大的中文搜索引擎、最大的中文网站。2000年1月由李彦宏创立于北京中关村，致力于向人们提供“简单，可依赖”的信息获取方式。“百度”二字源于中国宋朝词人辛弃疾的《青玉案·元夕》词句“众里寻他千百度”，象征着百度对中文信息检索技术的执著追求。
-            <br><img src="http://t11.baidu.com/it/u=3091876927,4220463602&fm=96">
-          </p>
+
+          <p>{{ corpInfo.content | safe }}</p>
+
       </div>
 
 

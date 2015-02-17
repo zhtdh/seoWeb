@@ -47,9 +47,6 @@ def logon(session, p_user, p_rtn):
     p_rtn.update({"rtnInfo": "用户不存在", "rtnCode": -1  })
 
 def saveArticleType(p_AType):
-  if {'id', 'parent_id'} & set(p_AType.keys()) != {'id', 'parent_id'}:
-        raise AppException('栏目缺少必要字段' + str(p_AType.keys()))
-
   if '_exState' not in p_AType:
     pass
   elif p_AType['_exState'] == 'new': # 添加新的栏目数据
@@ -61,7 +58,7 @@ def saveArticleType(p_AType):
     oldType = ArticleType.objects.get(id=p_AType['id'])
     changed_field = []
     for i in g_type_fields:
-      if oldType[i] != str(p_AType[i]):
+      if oldType[i] != str(p_AType[i]) and i not in g_auto_fields:
         oldType[i] = p_AType[i]
         changed_field.append(i)
     oldType.save(update_fields=changed_field)
@@ -139,9 +136,9 @@ def setArticle(p_dict, p_rtn, request):
   if l_art['_exState'] == 'new':
     recArt = Article()
   elif l_art['_exState'] == 'dirty':
-    recArt = Article.objects.filter(id=l_art['id'])
+    recArt = Article.objects.get(id=l_art['id'])
   for i in g_article_fields:
-    if i not in ('recname', 'rectime') and i in l_art: # 传递过来的参数。
+    if i not in g_auto_fields and i in l_art: # 传递过来的参数。
       recArt[i] = l_art[i]
   recArt["rectime"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -216,8 +213,8 @@ def getUserList(p_dict, p_rtn):
     total = User.objects.all().count()
   else:
     total = -1
-  p_rtn.update(genRtnOk("保存成功"))
-  p_rtn.update({"exObj": {  "rowCount": total,   "userList": users }})
+  p_rtn.update(genRtnOk("取得用户列表成功"))
+  p_rtn.update({"exObj": {"rowCount": total,   "userList": users }})
 
 def resetPw(p_dict, p_rtn):
   """ resetPw({ "username":"Admin","old":"xxx", "new":"xxx" }, p_rtn)  """
