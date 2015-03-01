@@ -168,21 +168,22 @@ def deleteArticle(p_dict, p_rtn, request):
     p_rtn.update(genRtnFail(request, "非本人记录不能更改。"))
 
 def setUser(p_dict, p_rtn, session):
-  """usage:  setuser ( { state:"new", username: xxx , pw : xxx, oldWord: xxx}, xx, x)  """
+  """usage:  setuser ( { state:"new", username: xxx , pw : xxx, oldWord: xxx,   ls_usertype = p_user['usertype']}, xx, x)  """
   p_set = set(p_dict.keys())
-  p_checkset = set(['_exState', 'username', 'pw'])
-  if p_set != p_checkset:
-    raise AppException('上传参数错误')
+  #p_checkset = set(['_exState', 'username', 'pw'])
+  #if p_set != p_checkset:
+  #  raise AppException('上传参数错误')
   if session['username'] == 'Admin':
     try:
       if p_dict['_exState'] == 'new':
-        new_u = User(username=p_dict['username'], pw=p_dict['pw'])
+        new_u = User(username=p_dict['username'], pw=p_dict['pw'], usertype=p_dict['usertype'])
         new_u.save(force_insert=True)
       elif p_dict['_exState'] == 'dirty':
         old_u = User.objects.get(username=p_dict['username'])
         if old_u.pw == p_dict['oldword']:
           old_u.pw = p_dict['pw']
-          old_u.save(force_update=True, update_fields=['pw'])
+          old_u.usertype=p_dict['usertype']
+          old_u.save(force_update=True, update_fields=['pw', 'usertype'])
         else:
           p_rtn.update(genRtnFail(None, "旧密码错误！"))
       elif p_dict['_exState'] == 'clean':

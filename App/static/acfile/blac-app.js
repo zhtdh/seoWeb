@@ -308,15 +308,16 @@ app.controller("ctrlAdminListUser", function($scope,blacAccess,blacPage,blacUtil
         if (lp.contentList) blacAccess.setDataState(lp.contentList, blacAccess.dataState.clean); else lp.contentList = [];
       });
   };
-  lp.singleRec = {username:"newUser", pw: ""};
+  lp.singleRec = {username:"newUser", pw: "", usertype:""};
 
   lp.addRecord = function(){
-    lp.singleRec = {username:"newUser", pw:""};
+    lp.singleRec = {username:"newUser", pw:"", usertype:"norm"};
     $('#userModal').modal( { backdrop: "static" } );
   };
 
   lp.saveRecord = function(){
-    var lAdd = { username:lp.singleRec.username, pw: blacUtil.md5String(lp.singleRec.username + lp.singleRec.pw) };
+    var lAdd = { username:lp.singleRec.username, pw: blacUtil.md5String(lp.singleRec.username + lp.singleRec.pw),
+                  usertype:lp.singleRec.usertype   };
     blacAccess.setDataState(lAdd, blacAccess.dataState.new);
     console.log(lAdd);
     blacAccess.setUserCont(lAdd).then(   // here we go . not finished

@@ -9,6 +9,7 @@ BoolCharacter=(('Y','是'),('N','否'))
 #           (',topApp,','应用'),
 #           (',topCase,','案例'),
 #           (',topContact,','行业'))
+# user type : su pow norm
 class BaseModel(models.Model):
     recname = models.CharField('创建人员', max_length=32,blank=True,null=True)
     rectime = models.CharField('创建时间', max_length=19,blank=True,null=True)
@@ -41,29 +42,12 @@ class BaseModel(models.Model):
                 raise Exception("日期型参数错误")
         else:
             self.__setattr__(key, value)
-
-    def clientToServerDataTrans(self):
-        '''字段值转换'''
-        for colModel in self._meta.local_fields:
-            if issubclass(type(colModel) ,models.fields.related.ForeignKey):
-                if colModel.null == True:
-                    if self[colModel.name + '_id'] == '':
-                        self[colModel.name] = colModel.get_default()
-                else:
-                    if self[colModel.name + '_id'] == '':
-                        raise Exception(colModel.verbose_name + '，存在非法值')
-            else:
-                if colModel.null == True:
-                    if self[colModel.name] == '':
-                        self[colModel.name] = colModel.get_default()
-                else:
-                    if self[colModel.name] == '':
-                        raise Exception(colModel.verbose_name + '，存在非法值')
     class Meta:
         abstract = True
 class User(BaseModel):
     username = models.CharField('用户',max_length=10,primary_key=True)
     pw = models.CharField('密码',max_length=40)
+    usertype = models.CharField('类型',max_length=4)
     def __str__(self):
         return self.username
     class Meta:
