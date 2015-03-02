@@ -36,7 +36,7 @@
           </div>
         </div>
 
-        <div class="panel panel-default">
+        <div ng-show="isAdmin" class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingThree">
             <h4 class="panel-title">
               <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="./#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -47,13 +47,13 @@
           <div id="collapseThree" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingThree">
             <div class="panel-body">
               <ul class="nav nav-sidebar" >
-              <li><a ui-sref="acadmin.user">用户管理2</a></li>
+              <li><a ui-sref="acadmin.user">用户管理</a></li>
             </ul>
             </div>
           </div>
         </div>
 
-        <div class="panel panel-default">
+        <div ng-show="isAdmin" class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingOne">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="./#collapseOne" aria-expanded="false" aria-controls="collapseOne">

@@ -101,8 +101,10 @@ app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAc
     }, function (error) {  lp.rtnInfo = JSON.stringify(error); });
   };
 });
-app.controller("ctrlAdminLeft", function($scope,blacUtil,blacAccess,$location,$http) {
+app.controller("ctrlAdminLeft", function($scope,blacUtil,blacStore,blacAccess,$location,$http) {
   var lp = $scope;
+
+  lp.isAdmin = blacStore.localUser() == "Admin"? true : false;
 
   // 后台管理端：栏目设置。
   {

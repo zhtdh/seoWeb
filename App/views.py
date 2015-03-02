@@ -209,13 +209,13 @@ def deleteUser(p_dict, p_rtn, session):
 
 def getUserList(p_dict, p_rtn):
   firstRow, lastRow, rowTotal = getPageRowNo(p_dict)
-  users = list(User.objects.exclude(username__exact='Admin').order_by('username').values('username')[firstRow:lastRow])
+  users = list(User.objects.exclude(username__exact='Admin').order_by('username').values('username', 'usertype')[firstRow:lastRow])
   if rowTotal == 0:
     total = User.objects.all().count()
   else:
     total = -1
   p_rtn.update(genRtnOk("取得用户列表成功"))
-  p_rtn.update({"exObj": {"rowCount": total,   "userList": users }})
+  p_rtn.update({"exObj": {"rowCount": total, "userList": users }})
 
 def resetPw(p_dict, p_rtn):
   """ resetPw({ "username":"Admin","old":"xxx", "new":"xxx" }, p_rtn)  """
