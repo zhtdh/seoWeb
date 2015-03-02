@@ -59,16 +59,7 @@
 
 
       <div class="block-border-all" style="min-height:600px; width:100%;padding:20px;">
-        <div>{{ contact }}</div>
-        <address>
-          <strong>魔法学校.</strong><br>
-          795 大街, 600号楼 <br>
-          山东省, 烟台市 264000<br>
-          <abbr title="电话">P:</abbr> (123) 456-7890
-        </address>
-
-          <iframe src="http://www.google.cn/maps/embed?pb=!1m14!1m8!1m3!1d12651.154910572879!2d121.25465115669486!3d37.560041123831276!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0000000000000000%3A0xaf128d80f40e091b!2z5aSp5Zyw5bm_5Zy6!5e0!3m2!1szh-CN!2scn!4v1418525633301"
-                  width="100%" height="400" frameborder="0" style="border:0"> </iframe>
+        <p>{{ contact.content | safe }}</p>
       </div>
 
 

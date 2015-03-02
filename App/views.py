@@ -46,10 +46,12 @@ def logon(session, p_user, p_rtn):
 def saveArticleType(p_AType):
   if '_exState' not in p_AType:
     pass
-  elif p_AType['_exState'] == 'new': # 添加新的栏目数据
+  elif p_AType['_exState'] == 'new':  # 添加新的栏目数据
     newType = ArticleType()
     for i in g_type_fields:
-      newType[i] = p_AType[i]
+      # 如果有这个栏目。
+      if i in p_AType.keys():
+        newType[i] = p_AType[i]
     newType.save()
   elif p_AType['_exState'] == 'dirty':  # 更新数据
     oldType = ArticleType.objects.get(id=p_AType['id'])

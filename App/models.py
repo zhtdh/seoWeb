@@ -54,7 +54,7 @@ class User(BaseModel):
         db_table = 'USER'
 class ArticleType(BaseModel):
     id = models.CharField('pk',primary_key=True,max_length=32)
-    parent = models.ForeignKey('ArticleType',verbose_name='父类型', \
+    parent = models.ForeignKey('ArticleType',verbose_name='父类型',
                                related_name='subarticletype',db_column='parent_id',on_delete=CASCADE,
                                blank=True,null=True)
     kind = models.CharField('内部类型名称',max_length=100,blank=True,null=True)
@@ -71,8 +71,8 @@ class ArticleType(BaseModel):
 
 class Article(BaseModel):
     id = models.CharField('pk',primary_key=True,max_length=32,db_index=True)
-    parent = models.ForeignKey('ArticleType', \
-        verbose_name='文章类型',related_name='fk_article',db_column='parent_id', \
+    parent = models.ForeignKey('ArticleType',
+        verbose_name='文章类型',related_name='fk_article',db_column='parent_id',
         on_delete=SET_NULL,blank=True,null=True,db_index=True)
     kind = models.CharField('内部类型名称',max_length=100,blank=True,null=True)
     title = models.CharField('标题',max_length=100)

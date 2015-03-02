@@ -13,13 +13,14 @@ def gool(request, goolArg="", goolSecArg=""):
             corpInfo = getCorpInfo()
             return render(request, "rendSec.html", locals())
         elif goolArg == "rethi":
+
             return render(request, "rendThi.html")
         elif goolArg == "refou":
             return render(request, "rendFou.html")
         elif goolArg == "refiv":
             return render(request, "rendFiv.html", locals())
         elif goolArg == "recon":
-            contact = getContact
+            contact = getContact()
             return render(request, "rendCon.html",locals())
         else:
             return HttpResponseRedirect("/")
@@ -33,12 +34,12 @@ def home(request):
 def getCorpInfo():
     try:
         return ArticleType.objects.filter(kind__icontains=',corpinfo,')[0].fk_article.all()[:1].values()[0]
+        # { 'recname': 'Admin', 'link': 'http://localhost:8000/resec/', .... # {{ xxx.content | safe }}
     except IndexError:
         return None
 
 def getContact():
     try:
-        return Article.objects.filter(parent_id='0')\
-            .filter(kind__icontains='topContact').values('content')[0]['content']
+        return ArticleType.objects.filter(kind__icontains=',topContact,')[0].fk_article.all()[:1].values()[0]
     except IndexError:
         return "无联系方式"
