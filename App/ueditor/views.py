@@ -170,7 +170,7 @@ def UploadFile(request):
     }
     max_size=int(request.GET.get(upload_max_size[action],USettings.UEditorUploadSettings.get(upload_max_size[action],0)))
     if  max_size!=0:
-        from App.ueditor.utils import FileSize
+        #from App.ueditor.utils import FileSize
         #MF=FileSize(max_size)
         if upload_file_size>max_size:
             state=u"上传文件大小超限"

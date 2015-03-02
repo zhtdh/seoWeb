@@ -3,9 +3,6 @@ from django.db import connection, transaction
 from django.shortcuts import render, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError, DatabaseError
-from django.views.decorators.csrf import csrf_exempt
-import json
-import datetime
 from App.utils import *
 from App.models import *
 from App.ueditor.views import get_ueditor_controller
