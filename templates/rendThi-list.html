@@ -1,5 +1,4 @@
 {% extends "rendSec.html" %}
-
 {% block cornerContent %}
 
     <ol class="breadcrumb block-shadow">
@@ -8,23 +7,21 @@
       {% endfor %}
     </ol>
 
-    <table class="table table-hover block-shadow">
-      <thead> <tr>
-        <th style="width:60px;">#</th>
-        <th style="width:auto;text-align: left;">标题</th>
-        <th style="width:200px;">发布时间</th>
-      </tr> </thead>
 
-      <tbody>
-        {% for iListItem in renderVal.contList %}
-        <tr>
-          <th scope="row">{{ forloop.counter }}</th>
-          <td><a href ="?reqid={{ iListItem.id }}">{{ iListItem.title }}</a></td>
-          <td>{{ iListItem.rectime }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="block-shadow" style="padding-left:25px;padding-top:5px;">
+    {% for iListItem in renderVal.contList %}
+      <div class="blog-post block-bottom">
+        <h4> <a href="{% if iListItem.link %} {{ iListItem.link }} {% else %}?reqid={{ iListItem.id }}{% endif %}" >{{ iListItem.title }} </a> </h4>
+        <img src="{{ iListItem.imglink }}" class="img-list-left">
+        <div class="post-meta">
+          <i class="glyphicon glyphicon-time"></i>  {{ iListItem.rectime }}
+          &nbsp;<i class="glyphicon glyphicon-camera"></i>  &nbsp;
+        </div>
+        <p> {{ iListItem.remark }}</p>
+      </div>
+    {% endfor %}
+    </div>
+
 
     <div style="text-align: center;">
       <ul class="pagination block-shadow">

@@ -14,7 +14,7 @@ class BaseModel(models.Model):
     recname = models.CharField('创建人员', max_length=32,blank=True,null=True)
     rectime = models.CharField('创建时间', max_length=19,blank=True,null=True)
     updtime = models.CharField('更新时间', max_length=19,blank=True,null=True)
-    remark = models.CharField('备注',blank=True,max_length=50,null=True)
+    remark = models.CharField('备注',blank=True,max_length=500,null=True)
 
     def __getitem__(self, k):     #  支持对象直接get属性['title']
       if isinstance(k,int):        #  serialize成json报错...why?

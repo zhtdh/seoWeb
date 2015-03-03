@@ -1,11 +1,8 @@
 # seoWeb
 
 rendSec.html -- cont - list 模版。
-
 cont -- 只需要一个模版就够了。
-
 list 可以多个。都从rendSec继承下来就可以。
-
 ---------------------------单记录的模版----------------------------------
     <ol class="breadcrumb block-shadow">
       {% for iPos in renderVal.position %}
@@ -17,7 +14,6 @@ list 可以多个。都从rendSec继承下来就可以。
         <p>{{ renderVal.contSingle.content | safe }}</p>
     </div>
 ---------------------------单记录的模版----------------------------------
-
 ---------------------------多记录的模版----------------------------------
     <div class="block-border-all block-shadow" style="min-height:400px; width:100%;padding:20px;">
 
@@ -38,3 +34,6 @@ list 可以多个。都从rendSec继承下来就可以。
     </div>
 
 ---------------------------多记录的模版----------------------------------
+
+多记录模版的类型：
+rendSec-list.html : 一行3个。循环无限？。
