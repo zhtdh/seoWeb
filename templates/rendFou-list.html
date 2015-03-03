@@ -1,0 +1,41 @@
+{% extends "rendSec.html" %}
+
+{% block cornerContent %}
+
+    <ol class="breadcrumb block-shadow">
+      {% for iPos in renderVal.position %}
+        <li><a href="{{ iPos.1 }}">{{ iPos.0 }}</a></li>
+      {% endfor %}
+    </ol>
+
+    <table class="table table-hover block-shadow">
+      <thead> <tr>
+        <th>#</th> <th>标题</th> <th>发布时间</th>
+      </tr> </thead>
+
+      <tbody>
+        {% for iListItem in renderVal.contList %}
+        <tr>
+          <th scope="row">1</th>
+          <td>iListItem.title</td>
+          <td>iListItem.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="text-align: center;">
+      <ul class="pagination block-shadow">
+        <li class="disabled"><a href="#">&laquo;</a></li>
+        <li><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li><a href="#">&raquo;</a></li>
+      </ul>
+    </div>
+
+
+
+{% endblock %}

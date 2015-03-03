@@ -1,6 +1,6 @@
 {% extends "foreBase.html" %}
 
-{% block title %} {{ corpInfo.title }} {% endblock %}
+{% block title %} {{ renderVal.title }} {% endblock %}
 
 {% block baseContent %}
 
@@ -15,19 +15,21 @@
   <div class="col-xs-3">
      <div class="list-group block-shadow">
         <a href="#/sec" class="list-group-item active" style="font-size: 12px;">
-          应用解决方案
+          快速导航
         </a>
-        <a href="#" class="list-group-item"><i class="glyphicon glyphicon-forward primary-color"></i> 行业应用1</a>
-        <a href="#" class="list-group-item"><i class="glyphicon glyphicon-forward primary-color"></i> 行业应用2</a>
-        <a href="#" class="list-group-item"><i class="glyphicon glyphicon-forward primary-color"></i> 行业应用3</a>
-        <a href="#" class="list-group-item"><i class="glyphicon glyphicon-forward primary-color"></i> 行业应用4</a>
+
+        {% for left1Item in renderVal.leftList1 %}
+          <a href="{{ left1Item.link }}" class="list-group-item">
+            <i class="glyphicon glyphicon-forward primary-color"></i> {{ left1Item.title }}</a>
+        {% endfor %}
+
      </div>
       <br>
     <div class="panel-group block-shadow" id="accordion" role="tablist" aria-multiselectable="true">
       <div class="panel panel-default">
         <div class="panel-heading" role="tab" id="headingOne">
           <a data-toggle="collapse" data-parent="#accordion" href="sec/#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          <span class="em-primary" style="color:white;font-size: 12px;"> 应用解决方案 </span>
+          <span class="em-primary" style="color:white;font-size: 12px;"> 微信公众号 </span>
         </a>
         </div>
         <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
@@ -39,12 +41,12 @@
       <div class="panel">
         <div class="panel-heading" role="tab" id="headingTwo">
             <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="sec/#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-              <span style="color:white;font-size: 12px;"> 应用解决方案2 </span>
+              <span style="color:white;font-size: 12px;"> 即将实现 </span>
             </a>
         </div>
         <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
           <div class="panel-body">
-            设立国家新兴产业创业投资引导基金，体现了改革的思路，基金正式运行后，更要用市场化的办法来操作！
+            承接国家新兴产业创业投资引导基金，创新引领科技，为美好明天努力耕耘！
           </div>
         </div>
       </div>
@@ -52,18 +54,8 @@
   </div>
 
   <div class="col-xs-9">
-    <ol class="breadcrumb block-shadow">
-      <li><a href="#">公司</a></li>
-      <li><a href="#">公司情况</a></li>
-    </ol>
 
-
-      <div class="block-border-all block-shadow" style="min-height:600px; width:100%;padding:20px;">
-
-          <p>{{ corpInfo.content | safe }}</p>
-
-      </div>
-
+    {% block cornerContent %}       {% endblock %}
 
   </div>
 </div>

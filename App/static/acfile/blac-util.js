@@ -223,7 +223,7 @@ angular.module('blac-util', ['angular-md5'])
       userLoginQ: userLoginQ,
       userChange:function(aUser,aOld,aNew){return httpQ( lpUrl,{func:'userChange',
         ex_parm:{username:aUser,old:md5.createHash(aUser+aOld), new: md5.createHash(aUser+aNew)}})},
-      getAdminColumn:function(){return httpQ(lpUrl,{func:'getAdminColumn',ex_parm:{} })},
+      getAdminColumn:function(aParam){return httpQ(lpUrl,{func:'getAdminColumn',ex_parm:aParam })},
       setAdminColumn:function(aArgs){return httpQ(lpUrl,{func:'setAdminColumn',ex_parm:{columnTree: aArgs } })},
       getArticleList:function(aLoc,aColId){return httpQ(lpUrl,{func:'getArticleList',ex_parm:{columnId:aColId,location:aLoc} })},
       getArticleCont:function(aArtId){return httpQ(lpUrl,{func:'getArticleCont',ex_parm:{articleId:aArtId} })},

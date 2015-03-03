@@ -112,7 +112,7 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacStore,blacAccess,$l
     lp.wrapConfirm = blacUtil.wrapConfirm;
 
     lp.initColumDefTree = function() {
-      blacAccess.getAdminColumn().then(
+      blacAccess.getAdminColumn({type:"admin"}).then(   // 管理员设置录入。
         function (data) {
           if (data.rtnCode == 1) lp.treeData[0].items = data.exObj.columnTree.items;
             else console.log(data);
@@ -176,7 +176,7 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacStore,blacAccess,$l
 
   // 后台管理端：  用户录入内容。
   {
-    blacAccess.getAdminColumn().then(
+    blacAccess.getAdminColumn({type:"user"}).then(
       function (data) {
           console.log(data);
         if (data.rtnCode == 1) lp.treeContentData = data.exObj.columnTree.items;

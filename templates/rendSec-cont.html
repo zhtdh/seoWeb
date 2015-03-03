@@ -1,0 +1,19 @@
+{% extends "rendSec.html" %}
+
+{% block cornerContent %}
+
+
+    <ol class="breadcrumb block-shadow">
+      {% for iPos in renderVal.position %}
+        <li><a href="{{ iPos.1 }}">{{ iPos.0 }}</a></li>
+      {% endfor %}
+    </ol>
+
+
+      <div class="block-border-all block-shadow" style="min-height:600px; width:100%;padding:20px;">
+
+          <p>{{ renderVal.contSingle.content | safe }}</p>
+
+      </div>
+
+{% endblock %}

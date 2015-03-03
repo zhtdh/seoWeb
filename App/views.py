@@ -80,21 +80,25 @@ def dealArticleType(p_dict, p_rtn):
   saveArticleType(p_dict)
   p_rtn.update(genRtnOk("保存栏目成功。"))
 
-def getArticleType(p_rtn):
+def getArticleType(p_rtn, aExparm):    # {type: user/admin}
   """   返回全部ArticleType """
   l_rtn = {'id': '0','parent_id':None,'title': '根','items': []}
   try:
-    getSubArticleType('0', l_rtn['items'])
+    getSubArticleType('0', l_rtn['items'], aExparm['type'])
     p_rtn.update( genRtnOk("查询栏目成功。") )
     p_rtn.update({"exObj": { "columnTree": l_rtn }})
   except ObjectDoesNotExist:
     p_rtn.update(genRtnFail(None, "根不存在"))
 
-def getSubArticleType(p_parent_id, p_items):
-  a_type = ArticleType.objects.filter(parent_id=p_parent_id).values() # 转化为dict{}
+def getSubArticleType(p_parent_id, p_items, aExType):
+  if aExType=="user":
+    a_type = ArticleType.objects.filter(parent_id=p_parent_id).exclude(
+      exkind__contains=",userinvisible,").values()       # 转化为 [dict{}
+  else:
+    a_type = ArticleType.objects.filter(parent_id=p_parent_id).values()  # 转化为 [dict{}
   for t in a_type:
     items = []
-    getSubArticleType(t['id'], items)
+    getSubArticleType(t['id'], items, aExType)
     l_tmp = {'items': items}
     t.update(l_tmp)
     p_items.append(t)
@@ -338,7 +342,7 @@ def dealREST(request):
         if ldict['func'] == 'setAdminColumn':
           dealArticleType(ldict['ex_parm']['columnTree'], l_rtn)
         elif ldict['func'] == 'getAdminColumn':
-          getArticleType(l_rtn)
+          getArticleType(l_rtn, ldict['ex_parm'])
         elif ldict['func'] == 'getArticleList':
           getArticleList(ldict['ex_parm'], l_rtn)
         elif ldict['func'] == 'getArticleCont':
@@ -346,7 +350,7 @@ def dealREST(request):
         elif ldict['func'] == 'setArticleCont':
           setArticle(ldict['ex_parm'], l_rtn, request)
         elif ldict['func'] == 'deleteArticleCont':
-          deleteArticle(ldict['ex_parm'], l_rtn, request.session)
+          deleteArticle(ldict['ex_parm'], l_rtn, request)
         elif ldict['func'] == 'setUserCont':
           setUser(ldict['ex_parm']['user'], l_rtn, request.session)
         elif ldict['func'] == 'deleteUserCont':

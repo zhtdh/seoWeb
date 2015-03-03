@@ -1,24 +1,13 @@
-# seoWeb
+{% extends "rendSec.html" %}
 
-rendSec.html -- cont - list 模版。
+{% block cornerContent %}
 
-cont -- 只需要一个模版就够了。
-
-list 可以多个。都从rendSec继承下来就可以。
-
----------------------------单记录的模版----------------------------------
     <ol class="breadcrumb block-shadow">
       {% for iPos in renderVal.position %}
         <li><a href="{{ iPos.1 }}">{{ iPos.0 }}</a></li>
       {% endfor %}
     </ol>
 
-    <div class="block-border-all block-shadow" style="min-height:600px; width:100%;padding:20px;">
-        <p>{{ renderVal.contSingle.content | safe }}</p>
-    </div>
----------------------------单记录的模版----------------------------------
-
----------------------------多记录的模版----------------------------------
     <div class="block-border-all block-shadow" style="min-height:400px; width:100%;padding:20px;">
 
       {% for iListItem in renderVal.contList %}
@@ -37,4 +26,4 @@ list 可以多个。都从rendSec继承下来就可以。
       {% endfor %}
     </div>
 
----------------------------多记录的模版----------------------------------
+{% endblock %}

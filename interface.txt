@@ -1,6 +1,6 @@
 全部基于post的方式。
 ====================================================================
-表column: id, parentid, kind, title, link. ordernum.
+表column: id, parentid, kind, title, link. exorder.
 + exorder
 exlink
 extitle
