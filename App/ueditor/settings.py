@@ -13,7 +13,8 @@ TOOLBARS_SETTINGS={
 UEditorSettings={
     "toolbars":TOOLBARS_SETTINGS["normal"],
     "autoFloatEnabled":False,
-    "defaultPathFormat":"%(basename)s_%(datetime)s_%(rnd)s.%(extname)s"   #默认保存上传文件的命名方式
+    #"defaultPathFormat":"%(basename)s_%(datetime)s_%(rnd)s.%(extname)s"   #默认保存上传文件的命名方式
+    "defaultPathFormat":"%(year)s/%(basename)s_%(datetime)s_%(rnd)s.%(extname)s"   #默认保存上传文件的命名方式
 }
 #请参阅php文件夹里面的config.json进行配置
 UEditorUploadSettings={
