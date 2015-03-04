@@ -291,8 +291,10 @@ def save_scrawl_file(request,filename):
     import base64
     try:
         content=request.POST.get(USettings.UEditorUploadSettings.get("scrawlFieldName","upfile"))
-        f = open(filename, 'wb')
-        f.write(base64.decodebytes(content))
+        #f = open(filename, 'wb')
+        f = open(filename, 'wb+')
+        #f.write(base64.decodebytes(content))
+        f.write(base64.b64decode(content))
         f.close()
         state="SUCCESS"
     except Exception as E:
