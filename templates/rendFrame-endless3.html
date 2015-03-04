@@ -1,0 +1,29 @@
+{% extends "rendFrame.html" %}
+
+{% block cornerContent %}
+
+    <ol class="breadcrumb block-shadow">
+      {% for iPos in renderVal.position %}
+        <li><a href="{{ iPos.1 }}">{{ iPos.0 }}</a></li>
+      {% endfor %}
+    </ol>
+
+    <div class="block-border-all block-shadow" style="min-height:400px; width:100%;padding:20px;">
+
+      {% for iListItem in renderVal.contList %}
+        {% cycle '<div class="row">' '' '' %}
+          <div class="col-xs-4  block-center" style="padding:5px;">
+            <a href="#" class="thumbnail">
+              <img src="{{ iListItem.imglink }}" alt="placeholder thumbnail">
+            </a>
+            {{ iListItem.title }}
+            <br>
+            <a href="{% if iListItem.link %} {{ iListItem.link }} {% else %}?reqid={{ iListItem.id }}{% endif %}" type="button" class="btn btn-primary btn-xs">
+              <i class="glyphicon glyphicon-forward"></i> 详细信息
+            </a>
+          </div>
+        {% cycle  '' ''  '</div>' %}
+      {% endfor %}
+    </div>
+
+{% endblock %}
