@@ -137,4 +137,4 @@ def gool(request, goolArg="", goolSecArg=""):
 
 def home(request):
     showCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').values()
-    return render(request, "home.html",locals())
+    return render(request, "home.html", locals())
