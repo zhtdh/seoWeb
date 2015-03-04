@@ -6,14 +6,21 @@ from django.views.decorators.http import *
 from App.utils import log
 from App.models import Article, ArticleType
 from math import ceil
+from seoWeb.settings import gNavCache
+
+
 
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
+    navMenuList = getNav()
+
     lArtId = request.GET.get('reqid', '0')
+
     lPageNo = int(request.GET.get('reqpg', '1'))
     lPagePer = int(request.GET.get('reqpr', '10'))
     lPageNo = 1 if lPageNo < 1 else lPageNo
     lPageAll = 1
+
     renderVal = {"title": "山东鼎成卫星导航定位技术有限公司",
                  "boardPic": "/static/img/top1.jpg",
                  "position": [("公司", '/resec/1/'), ("公司简介", '/resec/1/')],
@@ -31,7 +38,7 @@ def gool(request, goolArg="", goolSecArg=""):
                 renderVal["position"] = [("公司", '/resec/1/'), ("公司简介", '/resec/1/')]
                 renderVal["contSingle"] = ArticleType.objects.filter(kind__icontains=',corp-1-corpinfo-1,')[0].fk_article.all()[:1].values()[0]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
-                return render(request, "rendFrame-single.html", {"renderVal": renderVal})
+                return render(request, "rendFrame-single.html", locals())
             elif goolSecArg == "2":    # 资质荣誉：直接显示所有记录的图片链接。点击图片，显示详细信息。
                 renderVal["position"] = [("公司", '/resec/1/'), ("资质荣誉", '/resec/2/')]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
@@ -137,4 +144,26 @@ def gool(request, goolArg="", goolSecArg=""):
 
 def home(request):
     showCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').values()
+    navMenuList = getNav()
     return render(request, "home.html", locals())
+
+def getNav():
+    # return [ {"title":"", "hasChild":False, "childList":[{title:"", "link":""},{}...], "link":"" },  ... ]
+    global gNavCache  # 全局缓冲，防止每次都查询数据库导航菜单。
+    if len(gNavCache) > 0:
+        pass
+    else:
+      navTopList = ArticleType.objects.filter(kind__icontains=',nav0-n,').order_by('exorder').values()
+      navSecList = ArticleType.objects.filter(kind__icontains=',nav0-n-nav1-n,').order_by('exorder').values()
+      navAllList = []
+      for iTop in navTopList:
+          childListTmp = []
+          hasChildTmp = False
+          for iSub in navSecList:
+            if iSub["parent_id"] == iTop["id"]:
+              hasChildTmp = True
+              childListTmp.append( { "title": iSub["title"], "link":iSub["link"] } )
+          navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
+      log("-- i select database for menu --")
+      gNavCache = navAllList
+    return gNavCache

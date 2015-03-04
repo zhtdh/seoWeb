@@ -39,40 +39,21 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="nav-item"><a href="/">首 页</a></li>
-            <li class="dropdown nav-item">
-              <a href="/resec" class="dropdown-toggle"  data-toggle="dropdown"> 公 司 <span class="caret"></span></a>
-              <ul class="dropdown-menu nav-menu-color" role="menu">
-                <li class="bc-menulist"><a href="/resec/1/">公司简介 </a></li>
-                <li class="bc-menulist"><a href="/resec/2/">资质荣誉 </a></li>
-                <li class="bc-menulist"><a href="/resec/3/">企业动态 </a></li>
-                <li class="bc-menulist"><a href="/resec/4/">行业新闻 </a></li>
-              </ul>
-            </li>
+            {% for iNavMenu in navMenuList %}
+              {% if iNavMenu.hasChild %}
+                <li class="dropdown nav-item">
+                  <a href="{{ iNavMenu.link }}" class="dropdown-toggle"  data-toggle="dropdown"> {{ iNavMenu.title }} <span class="caret"></span></a>
+                  <ul class="dropdown-menu nav-menu-color" role="menu">
+                    {% for iNavMenuSub in iNavMenu.childList %}
+                      <li class="bc-menulist"><a href="{{ iNavMenuSub.link }}">{{ iNavMenuSub.title }} </a></li>
+                    {% endfor %}
+                </ul>
+              </li>
+              {% else %}
+                <li class="nav-item"><a href="{{ iNavMenu.link }}">{{ iNavMenu.title }}</a></li>
+              {% endif %}
+            {% endfor %}
 
-            <li class="dropdown nav-item">
-              <a href="/rethi" class="dropdown-toggle"   data-toggle="dropdown">产 品<span class="caret"></span></a>
-              <ul class="dropdown-menu nav-menu-color" role="menu">
-                <li class="bc-menulist"><a href="/rethi/1">产品应用1 &nbsp;</a></li>
-                <li class="bc-menulist"><a href="/rethi/2">产品应用2 &nbsp;</a></li>
-                <li class="bc-menulist"><a href="/rethi/3">产品应用3 &nbsp;</a></li>
-                <li class="bc-menulist"><a href="/rethi/4">产品应用4 &nbsp;</a></li>
-                <li class="bc-menulist"><a href="/rethi/5">产品应用5 &nbsp;</a></li>
-              </ul>
-            </li>
-            <li class="dropdown nav-item">
-              <a href="/refiv" class="dropdown-toggle"   data-toggle="dropdown">行 业<span class="caret"></span></a>
-              <ul class="dropdown-menu nav-menu-color" role="menu">
-                <li class="bc-menulist"><a href="/refiv/1">行业应用1&nbsp;&nbsp;&nbsp; </a></li>
-                <li class="bc-menulist"><a href="/refiv/2">行业应用2&nbsp;&nbsp;&nbsp; </a></li>
-                <li class="bc-menulist"><a href="/refiv/3">行业应用3&nbsp;&nbsp;&nbsp; </a></li>
-                <li class="bc-menulist"><a href="/refiv/4">行业应用4&nbsp;&nbsp;&nbsp; </a></li>
-                <li class="bc-menulist"><a href="/refiv/5">行业应用5&nbsp;&nbsp;&nbsp; </a></li>
-              </ul>
-            </li>
-            <li class="nav-item"><a href="/refou">典型客户</a></li>
-
-            <li class="nav-item"><a href="/recon">联系我们</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>

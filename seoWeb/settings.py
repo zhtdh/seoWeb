@@ -94,3 +94,5 @@ MEDIA_ROOT = BASE_DIR + "/App/static/media"
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
+
+gNavCache = []
