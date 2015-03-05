@@ -6,7 +6,7 @@ from django.views.decorators.http import *
 from App.utils import log
 from App.models import Article, ArticleType
 from math import ceil
-from seoWeb.settings import gNavCache
+from App import gNavCache
 
 
 
@@ -145,6 +145,13 @@ def gool(request, goolArg="", goolSecArg=""):
 def home(request):
     showCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').values()
     navMenuList = getNav()
+    gridShowList = ArticleType.objects.filter(kind__icontains=',top-1-grid-1-list-n,').values('title', 'exlink', 'remark', 'link')
+    # rightBarList 很不友好。 1、2、3、4排序来的。4是视频
+    rightBarList = ArticleType.objects.filter(kind__icontains=',top-1-right-1-n,').order_by('exorder').values('title', 'exlink', 'remark', 'link')
+    # 得到1、2的列表内容前5项
+    rightBarGet1List = ArticleType.objects.filter(kind__icontains = rightBarList[0]["exlink"])[0].fk_article.all()[0:5].values('title', 'id', 'rectime', 'link')
+    rightBarGet2List = ArticleType.objects.filter(kind__icontains = rightBarList[1]["exlink"])[0].fk_article.all()[0:5].values('title', 'id', 'rectime', 'link')
+
     return render(request, "home.html", locals())
 
 def getNav():
@@ -153,17 +160,21 @@ def getNav():
     if len(gNavCache) > 0:
         pass
     else:
-      navTopList = ArticleType.objects.filter(kind__icontains=',nav0-n,').order_by('exorder').values()
-      navSecList = ArticleType.objects.filter(kind__icontains=',nav0-n-nav1-n,').order_by('exorder').values()
-      navAllList = []
-      for iTop in navTopList:
-          childListTmp = []
-          hasChildTmp = False
-          for iSub in navSecList:
-            if iSub["parent_id"] == iTop["id"]:
-              hasChildTmp = True
-              childListTmp.append( { "title": iSub["title"], "link":iSub["link"] } )
-          navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
-      log("-- i select database for menu --")
-      gNavCache = navAllList
+        navTopList = ArticleType.objects.filter(kind__icontains=',nav0-n,').order_by('exorder').values()
+        navSecList = ArticleType.objects.filter(kind__icontains=',nav0-n-nav1-n,').order_by('exorder').values()
+        navAllList = []
+        for iTop in navTopList:
+            childListTmp = []
+            hasChildTmp = False
+            for iSub in navSecList:
+                if iSub["parent_id"] == iTop["id"]:
+                    hasChildTmp = True
+                    childListTmp.append( { "title": iSub["title"], "link":iSub["link"] } )
+            navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
+        log("-- i select database for menu --")
+        gNavCache = navAllList
     return gNavCache
+
+
+
+
