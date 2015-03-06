@@ -39,7 +39,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       templateUrl: "partials/acadmincolselfedit.html"
     })
     .state('acadmin.listart', {
-      url: "/listart/:columnId",
+      url: "/listart/:columnId/:linkPrefix",
       templateUrl: "partials/acadminlistart.html"
     })
     .state('acadmin.user', {
@@ -67,7 +67,7 @@ app.controller("ctrlExtools",function($scope,blacAccess,blacUtil){
     );
   }
 });
-app.controller("ctrlAdminTop",function($scope,blacStore,blacAccess) {
+app.controller("ctrlAdminTop",function($location,$scope,blacStore,blacAccess) {
   var lp = $scope;
   lp.loginedUser = blacStore.localUser();
   lp.$on(blacAccess.gEvent.login, function(){
@@ -78,6 +78,7 @@ app.controller("ctrlAdminTop",function($scope,blacStore,blacAccess) {
   });
   lp.logout = function(){
     lp.loginedUser = null
+    $location.path('/login')
   }
 
 });
@@ -193,14 +194,15 @@ app.controller("ctrlAdminLeft", function($scope,blacUtil,blacStore,blacAccess,$l
       if (lp.clickContentNode.id != aNode.$modelValue.id) {
         lp.clickContentNode = aNode.$modelValue;
         lp.psContentInfo = { pageCurrent: 1, pageRows: 10, pageTotal: 0  };
-        $location.path('/acadmin/listart/' + lp.clickContentNode.id);
+        $location.path('/acadmin/listart/' + lp.clickContentNode.id + "/" + window.btoa(lp.clickContentNode.link));
       }
     };
   }
 });
-app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,$window,$location,$http,$stateParams) {
+app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacStore,blacPage,$window,$location,$http,$stateParams) {
   var lp = $scope;
   var lColumnId = $stateParams.columnId;
+  lp.linkPrefix = window.atob($stateParams.linkPrefix);
   var lEditorId = "uEditor";
   lp.clickContentNode = { id : 0 };  // init;
 
@@ -224,7 +226,8 @@ app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,
   };
   lp.editArticle = function(aArg){
     if (aArg == -1 ) {  // 在当前的父栏目下面增加新的内容。
-      lp.singArticle = {id: blacUtil.createUUID(), parent_id:lColumnId, kind:"", title:"", content:"", imglink:"", videolink:"", recname:"", rectime:""};
+      lp.singArticle = {id: blacUtil.createUUID(), parent_id:lColumnId, kind:"", title:"", content:"",
+        imglink:"", videolink:"", recname:blacStore.localUser(), rectime:blacUtil.strDateTime()};
       blacAccess.setDataState(lp.singArticle, blacAccess.dataState.new);
       UE.getEditor(lEditorId).setContent('');
     }
@@ -264,6 +267,9 @@ app.controller("ctrlAdminListArt", function($scope,blacUtil,blacAccess,blacPage,
             }
           }
           lp.closeArticle();
+        }
+        else{
+          if (data.alertType == 1) alert(data.rtnInfo);
         }
       }
     )

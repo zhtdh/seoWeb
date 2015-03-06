@@ -36,6 +36,7 @@ def logon(session, p_user, p_rtn):
     user = User.objects.get(username=ls_name)
     if user.pw == ls_pw:
       session['username'] = ls_name
+      session['usertype'] = user.usertype
       p_rtn.update({"rtnInfo": "登录成功", "rtnCode": 1 })
     else:
       session["username"] = None
@@ -153,8 +154,15 @@ def setArticle(p_dict, p_rtn, request):
     if request.session['username'] == recArt['recname'] or request.session['username'] == 'Admin':
       recArt.save()
       p_rtn.update(genRtnOk("纪录保存成功"))
+    elif recArt['recname'] == 'Admin':
+      p_rtn.update(genRtnFail(request, "Admin所有的记录只能本人修改。"))
+      p_rtn["alertType"] = 1
+    elif request.session['usertype'] == "pow":
+      recArt.save()
+      p_rtn.update(genRtnOk("纪录保存成功"))
     else:
-       p_rtn.update(genRtnFail(request, "非本人记录不能更改。"))
+      p_rtn.update(genRtnFail(request, "非本人记录不能更改。"))
+      p_rtn["alertType"] = 1
   elif l_art['_exState'] == 'clean':
     p_rtn.update(genRtnOk("没有需要保存的文章"))
   else:

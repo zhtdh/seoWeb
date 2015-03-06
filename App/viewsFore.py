@@ -47,7 +47,7 @@ def gool(request, goolArg="", goolSecArg=""):
                     return render(request, "rendFrame-single.html", locals())
                 else:
                     lPageAll = 1
-                    renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',corp-1-honor-1,')[0].fk_article.all().values()
+                    renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',corp-1-honor-1,')[0].fk_article.all().order_by('exorder').values()
                     return render(request, "rendFrame-endless3.html", locals())
             elif goolSecArg == "3":    # 企业动态
                 renderVal["position"] = [("公司", '/resec/1/'), ("企业动态", '/resec/3/')]
@@ -56,7 +56,7 @@ def gool(request, goolArg="", goolSecArg=""):
                     renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
                     return render(request, "rendFrame-single.html", locals())
                 else:
-                    renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',corp-1-activity-1,')[0].fk_article.all()[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
+                    renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',corp-1-activity-1,')[0].fk_article.all().order_by('-exorder')[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
                     lPageAll = ceil(ArticleType.objects.filter(kind__icontains=',corp-1-activity-1,')[0].fk_article.all().count() / lPagePer)
                     return render(request, "rendFrame-table.html", locals())
             elif goolSecArg == "4":    # 行业新闻
@@ -66,7 +66,7 @@ def gool(request, goolArg="", goolSecArg=""):
                     renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
                     return render(request, "rendFrame-single.html", locals())
                 else:
-                    renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',corp-1-news-1,')[0].fk_article.all()[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
+                    renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',corp-1-news-1,')[0].fk_article.all().order_by('-exorder')[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
                     lPageAll = ceil(ArticleType.objects.filter(kind__icontains=',corp-1-news-1,')[0].fk_article.all().count() / lPagePer)
                     return render(request, "rendFrame-table.html", locals())
             else:
@@ -90,7 +90,7 @@ def gool(request, goolArg="", goolSecArg=""):
                 renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
                 return render(request, "rendFrame-single.html", locals())
             else:
-                renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',app-1-app' + goolSecArg + '-1,')[0].fk_article.all()[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
+                renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',app-1-app' + goolSecArg + '-1,')[0].fk_article.all().order_by('-exorder')[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
                 lPageAll = ceil(ArticleType.objects.filter(kind__icontains=',app-1-app' + goolSecArg + '-1,')[0].fk_article.all().count() / lPagePer)
                 return render(request, "rendFrame-line.html", locals())
 
@@ -102,7 +102,7 @@ def gool(request, goolArg="", goolSecArg=""):
                 renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
                 return render(request, "rendFrame-single.html", locals())
             else:
-                renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',case-1,')[0].fk_article.all()[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
+                renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',case-1,')[0].fk_article.all().order_by('-exorder')[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
                 lPageAll = ceil(ArticleType.objects.filter(kind__icontains=',case-1,')[0].fk_article.all().count() / lPagePer)
                 return render(request, "rendFrame-table.html", locals())
 
@@ -125,7 +125,7 @@ def gool(request, goolArg="", goolSecArg=""):
                 renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
                 return render(request, "rendFrame-single.html", locals())
             else:
-                renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',ind-1-ind' + goolSecArg + '-1,')[0].fk_article.all()[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
+                renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',ind-1-ind' + goolSecArg + '-1,')[0].fk_article.all().order_by('-exorder')[(lPageNo-1)*lPagePer:lPageNo*lPagePer].values()
                 lPageAll = ceil(ArticleType.objects.filter(kind__icontains=',ind-1-ind' + goolSecArg + '-1,')[0].fk_article.all().count() / lPagePer)
                 return render(request, "rendFrame-grid3.html", locals())
         elif goolArg == "recon": # 联系我们，左边链接显示公司的左边链接。

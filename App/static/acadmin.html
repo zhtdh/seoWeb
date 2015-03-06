@@ -24,7 +24,7 @@
     </div>
     <p class="nav navbar-nav navbar-right" style="line-height:50px; margin-right:0px">
       {{ broadInfo }}
-      <a href="#" ng-click="logout()"></a>
+      <a ng-show="loginedUser" href="" ng-click="logout()" style="color:gray;"> 退出 </a>
     </p>
   </div>
 </nav>
