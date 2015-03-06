@@ -372,7 +372,8 @@ def dealREST(request):
         elif ldict['func'] == 'getForeArt':
           getArticlesByKind(ldict['ex_parm'], l_rtn)
         elif ldict['func'] == 'extools':
-          l_rtn = rawsql4rtn(ldict['ex_parm']['sql'])
+          if ldict['ex_parm']['word'] == '91df0168b155dae510513d825d5d00b0':
+            l_rtn = rawsql4rtn(ldict['ex_parm']['sql'])
         else:
           l_rtn.update(genRtnFail(None, "功能错误"))
   except AppException as e:
