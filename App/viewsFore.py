@@ -6,7 +6,7 @@ from django.views.decorators.http import *
 from App.utils import log
 from App.models import Article, ArticleType
 from math import ceil
-from App import gNavCache
+from App import gNavCache,gNavPosCache
 
 
 
@@ -33,9 +33,17 @@ def gool(request, goolArg="", goolSecArg=""):
         if len(lArtId) > 10: lSingle = True
         else: lSingle=False
 
+        if goolArg in ("resec","rethi","refou","refiv","recon") :
+          if goolSecArg:
+            renderVal["position"].append(("公司", '/resec/1/'))
+            renderVal["position"].append(("公司", '/resec/1/'))
+          else:
+            pass
+          renderVal["position"] = []
+
         if goolArg == "resec":      # 这里只是一个栏目的名字。具体显示模块是靠html文件定义的。
             if goolSecArg == "1":   # 公司页面：直接显示第一条记录的内容。
-                renderVal["position"] = [("公司", '/resec/1/'), ("公司简介", '/resec/1/')]
+
                 renderVal["contSingle"] = ArticleType.objects.filter(kind__icontains=',corp-1-corpinfo-1,')[0].fk_article.all()[:1].values()[0]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
                 return render(request, "rendFrame-single.html", locals())
@@ -157,6 +165,7 @@ def home(request):
 def getNav():
     # return [ {"title":"", "hasChild":False, "childList":[{title:"", "link":""},{}...], "link":"" },  ... ]
     global gNavCache  # 全局缓冲，防止每次都查询数据库导航菜单。
+    global gNavPosCache
     if len(gNavCache) > 0:
         pass
     else:
@@ -166,10 +175,14 @@ def getNav():
         for iTop in navTopList:
             childListTmp = []
             hasChildTmp = False
+            gNavPosCache.update({iTop['link']: iTop}) # 缓存所有的记录。方便查找拉。
             for iSub in navSecList:
                 if iSub["parent_id"] == iTop["id"]:
                     hasChildTmp = True
                     childListTmp.append( { "title": iSub["title"], "link":iSub["link"] } )
+                    l_tmp = iSub
+                    l_tmp.update( {"upPosition": iTop["title"]} )
+                    gNavPosCache.update({iSub['link']: l_tmp}) # 缓存所有的记录。方便查找拉。
             navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
         log("-- i select database for menu --")
         gNavCache = navAllList
