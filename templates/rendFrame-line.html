@@ -12,7 +12,7 @@
     {% for iListItem in renderVal.contList %}
       <div class="blog-post block-bottom">
         <h4> <a href="{% if iListItem.link %} {{ iListItem.link }} {% else %}?reqid={{ iListItem.id }}{% endif %}" >{{ iListItem.title }} </a> </h4>
-        <img src="{{ iListItem.imglink }}" class="img-list-left">
+        <img src="{{ iListItem.imglink }}" class="img-list-left border-all" style="width:120px;height:80px;">
         <div class="post-meta">
           <i class="glyphicon glyphicon-time"></i>  {{ iListItem.rectime }}
           &nbsp;<i class="glyphicon glyphicon-camera"></i>  &nbsp;
@@ -30,8 +30,8 @@
         <li><a href="?reqpg=1&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
         <li><a href="?reqpg={% if lPageNo > 1 %}{{ lPageNo|add:"-1" }}{% else %}1{% endif %}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-chevron-left"></i></a></li>
         <li><a href="#">{{ lPageNo }}</a></li>
-        <li><a href="?reqpg={% if lPageNo < lPageAll %}{{ lPageNo|add:"1" }}{% else %}{{ lPageAll }}{% endif %}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-chevron-right"></i></a></li>
-        <li><a href="?reqpg={{ lPageAll }}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+        <li {% if lPageNo == lPageAll %}class="disabled"{% endif %}><a href="?reqpg={% if lPageNo < lPageAll %}{{ lPageNo|add:"1" }}{% else %}{{ lPageAll }}{% endif %}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-chevron-right"></i></a></li>
+        <li {% if lPageNo == lPageAll %}class="disabled"{% endif %}><a href="?reqpg={{ lPageAll }}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
       </ul>
     </div>
 

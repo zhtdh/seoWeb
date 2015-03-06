@@ -29,5 +29,16 @@
     {% endfor %}
     </div>
 
+    <div style="text-align: center;">
+      <ul class="pagination block-shadow">
+        <li><a href="?reqpg=1&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
+        <li><a href="?reqpg={% if lPageNo > 1 %}{{ lPageNo|add:"-1" }}{% else %}1{% endif %}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-chevron-left"></i></a></li>
+        <li><a href="#">{{ lPageNo }}</a></li>
+        <li {% if lPageNo == lPageAll %}class="disabled"{% endif %}><a href="?reqpg={% if lPageNo < lPageAll %}{{ lPageNo|add:"1" }}{% else %}{{ lPageAll }}{% endif %}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-chevron-right"></i></a></li>
+        <li {% if lPageNo == lPageAll %}class="disabled"{% endif %}><a href="?reqpg={{ lPageAll }}&&reqpr={{ lPagePer }}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+      </ul>
+    </div>
+
+
 
 {% endblock %}

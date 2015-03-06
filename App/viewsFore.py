@@ -12,6 +12,7 @@ from App import gNavCache,gNavPosCache
 
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
+    global gNavPosCache
     navMenuList = getNav()
 
     lArtId = request.GET.get('reqid', '0')
@@ -34,21 +35,18 @@ def gool(request, goolArg="", goolSecArg=""):
         else: lSingle=False
 
         if goolArg in ("resec","rethi","refou","refiv","recon") :
+          l_pos1 = '/'+goolArg+'/'
+          renderVal["position"] = [ (gNavPosCache[l_pos1]["title"], l_pos1) ]
           if goolSecArg:
-            renderVal["position"].append(("公司", '/resec/1/'))
-            renderVal["position"].append(("公司", '/resec/1/'))
-          else:
-            pass
-          renderVal["position"] = []
+            l_pos2 = l_pos1 + goolSecArg+'/';
+            renderVal["position"].append( (gNavPosCache[l_pos2]["title"],l_pos2) )
 
         if goolArg == "resec":      # 这里只是一个栏目的名字。具体显示模块是靠html文件定义的。
             if goolSecArg == "1":   # 公司页面：直接显示第一条记录的内容。
-
                 renderVal["contSingle"] = ArticleType.objects.filter(kind__icontains=',corp-1-corpinfo-1,')[0].fk_article.all()[:1].values()[0]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
                 return render(request, "rendFrame-single.html", locals())
             elif goolSecArg == "2":    # 资质荣誉：直接显示所有记录的图片链接。点击图片，显示详细信息。
-                renderVal["position"] = [("公司", '/resec/1/'), ("资质荣誉", '/resec/2/')]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
                 if lSingle:
                     renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
@@ -58,7 +56,6 @@ def gool(request, goolArg="", goolSecArg=""):
                     renderVal["contList"] = ArticleType.objects.filter(kind__icontains=',corp-1-honor-1,')[0].fk_article.all().order_by('exorder').values()
                     return render(request, "rendFrame-endless3.html", locals())
             elif goolSecArg == "3":    # 企业动态
-                renderVal["position"] = [("公司", '/resec/1/'), ("企业动态", '/resec/3/')]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
                 if lSingle:
                     renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
@@ -68,7 +65,6 @@ def gool(request, goolArg="", goolSecArg=""):
                     lPageAll = ceil(ArticleType.objects.filter(kind__icontains=',corp-1-activity-1,')[0].fk_article.all().count() / lPagePer)
                     return render(request, "rendFrame-table.html", locals())
             elif goolSecArg == "4":    # 行业新闻
-                renderVal["position"] = [("公司", '/resec/1/'), ("行业新闻", '/resec/4/')]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
                 if lSingle:
                     renderVal["contSingle"] = Article.objects.filter(id=lArtId).values()[0]
@@ -82,15 +78,7 @@ def gool(request, goolArg="", goolSecArg=""):
         elif goolArg == "rethi":    # 行业应用：全部都是一个模式。
             renderVal["boardPic"] = "/static/img/top2.jpg"
             lPagePer = 6
-            if goolSecArg == "1":
-              renderVal["position"] = [("产品应用", '/' + goolArg + '/1/'), ("产品应用", '/' + goolArg + '/1/')]
-            elif goolSecArg == "2":
-              renderVal["position"] = [("产品应用", '/' + goolArg + '/1/'), ("产品应用", '/' + goolArg + '/2/')]
-            elif goolSecArg == "3":
-              renderVal["position"] = [("产品应用", '/' + goolArg + '/1/'), ("产品应用", '/' + goolArg + '/3/')]
-            elif goolSecArg == "4":
-              renderVal["position"] = [("产品应用", '/' + goolArg + '/1/'), ("产品应用", '/' + goolArg + '/4/')]
-            else:
+            if not goolSecArg:
               return HttpResponseRedirect('/' + goolArg + "/1/")
             renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',app-1-list1-n,').order_by('exorder').values()
 
@@ -117,15 +105,7 @@ def gool(request, goolArg="", goolSecArg=""):
         elif goolArg == "refiv":   # 行业应用。
             renderVal["boardPic"] = "/static/img/top4.jpg"
             lPagePer = 9
-            if goolSecArg == "1":
-              renderVal["position"] = [("行业应用", '/' + goolArg + '/1/'), ("行业应用", '/' + goolArg + '/1/')]
-            elif goolSecArg == "2":
-              renderVal["position"] = [("行业应用", '/' + goolArg + '/1/'), ("行业应用", '/' + goolArg + '/2/')]
-            elif goolSecArg == "3":
-              renderVal["position"] = [("行业应用", '/' + goolArg + '/1/'), ("行业应用", '/' + goolArg + '/3/')]
-            elif goolSecArg == "4":
-              renderVal["position"] = [("行业应用", '/' + goolArg + '/1/'), ("行业应用", '/' + goolArg + '/4/')]
-            else:
+            if not goolSecArg:
               return HttpResponseRedirect('/' + goolArg + "/1/")
             renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',ind-1-list1-n,').order_by('exorder').values()
 
@@ -180,9 +160,7 @@ def getNav():
                 if iSub["parent_id"] == iTop["id"]:
                     hasChildTmp = True
                     childListTmp.append( { "title": iSub["title"], "link":iSub["link"] } )
-                    l_tmp = iSub
-                    l_tmp.update( {"upPosition": iTop["title"]} )
-                    gNavPosCache.update({iSub['link']: l_tmp}) # 缓存所有的记录。方便查找拉。
+                    gNavPosCache.update({iSub['link']: iSub}) # 缓存所有的记录。方便查找拉。
             navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
         log("-- i select database for menu --")
         gNavCache = navAllList
