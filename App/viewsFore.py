@@ -6,9 +6,10 @@ from django.views.decorators.http import *
 from App.utils import log
 from App.models import Article, ArticleType
 from math import ceil
-from App import gNavCache,gNavPosCache
-
-
+# 第一次访问时取得内容。
+gNavCache = []       # 导航菜单缓存。[{"title","link","hasChild","childList":[]}, ... ]
+gNavPosCache = {}    # 位置导航缓存。{ '/recon/1/': articletype, ...}
+gSetupCache = {}
 
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
@@ -22,7 +23,11 @@ def gool(request, goolArg="", goolSecArg=""):
     lPageNo = 1 if lPageNo < 1 else lPageNo
     lPageAll = 1
 
-    renderVal = {"title": "山东鼎成卫星导航定位技术有限公司",
+    renderVal = {"title": gSetupCache['corp'],
+                 "webrecord": gSetupCache['webrecord'],
+                 "description": gSetupCache['description'],
+                 "keywords": gSetupCache['keywords'],
+
                  "boardPic": "/static/img/top1.jpg",
                  "position": [("公司", '/resec/1/'), ("公司简介", '/resec/1/')],
                  "artId": lArtId,
@@ -30,6 +35,7 @@ def gool(request, goolArg="", goolSecArg=""):
                  "contList": [],
                  "contSingle": {}
                 }
+
     try:
         if len(lArtId) > 10: lSingle = True
         else: lSingle=False
@@ -131,6 +137,12 @@ def gool(request, goolArg="", goolSecArg=""):
         return HttpResponse("gool执行错误：%s" % str(e.args))
 
 def home(request):
+    renderVal = {"title": gSetupCache['corp'],
+                 "webrecord": gSetupCache['webrecord'],
+                 "description": gSetupCache['description'],
+                 "keywords": gSetupCache['keywords']
+              }
+
     showCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').values()
     navMenuList = getNav()
     gridShowList = ArticleType.objects.filter(kind__icontains=',top-1-grid-1-list-n,').values('title', 'exlink', 'remark', 'link')
@@ -162,10 +174,13 @@ def getNav():
                     childListTmp.append( { "title": iSub["title"], "link":iSub["link"] } )
                     gNavPosCache.update({iSub['link']: iSub}) # 缓存所有的记录。方便查找拉。
             navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
-        log("-- i select database for menu --")
+        log("-- i select database and cached it for menu,  --")
         gNavCache = navAllList
     return gNavCache
 
-
-
-
+#初始化应用的变量。
+getNav()
+gSetupCache = eval(ArticleType.objects.filter(kind__icontains=',top-1-setup-1,').values('remark')[0]["remark"])
+gSetupCache.update({'description': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-desc-1,').values('remark')[0]["remark"] })
+gSetupCache.update({'keywords': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-key-1,').values('remark')[0]["remark"] })
+# {'corp':'悦源工作室', 'webrecord':'鲁ICP备12345678号'}

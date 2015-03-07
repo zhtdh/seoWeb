@@ -2,9 +2,9 @@
 <html ng-app="blacapp" ng-controller="angIndex">
   <head>
     <meta charset="utf-8">
-    <meta name="description" content="山东鼎成卫星导航定位技术有限公司 北斗 GPS 卫星 导航 定位 形变 检测 " />
-    <meta name="keywords" content="山东鼎成卫星导航定位技术有限公司 北斗 GPS 卫星 导航 定位 形变 检测 " />
-    <title>{% block title %} 网站标题 {% endblock %}</title>
+    <meta name="description" content="{{ renderVal.description }}" />
+    <meta name="keywords" content="{{ renderVal.keywords }}" />
+    <title>{% block title %} 页面标题 {% endblock %}</title>
     <link href="/static/css/bootstrap.css" rel="stylesheet">
     <link href="/static/css/main.css" rel="stylesheet">
     <style>
@@ -67,8 +67,8 @@
     <div class="row" >
       <footer class="footer-main">
           <div class="col-xs-4 col-xs-offset-4" style="text-align: center;">
-            <ul> 网站备案号xxxxxxxxxxxxx </ul>
-            <ul> tel: 400-12345678 </ul>
+            <ul> 网站备案号：{{ renderVal.webrecord }} </ul>
+            <ul>  </ul>
 
           </div>
       </footer>
