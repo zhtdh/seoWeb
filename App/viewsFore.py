@@ -128,6 +128,14 @@ def gool(request, goolArg="", goolSecArg=""):
             renderVal["contSingle"] = ArticleType.objects.filter(kind__icontains=',cont-1,')[0].fk_article.all()[:1].values()[0]
             renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
             return render(request, "rendFrame-single.html", locals())
+        elif goolArg == "refresh":
+            global gNavCache
+            global gNavPosCache
+            global gSetupCache
+
+            gNavCache = []
+            gNavPosCache = {}
+            gSetupCache = {}    
         else:
             return HttpResponseRedirect("/")
 
