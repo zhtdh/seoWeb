@@ -10,11 +10,14 @@ from math import ceil
 gNavCache = []       # 导航菜单缓存。[{"title","link","hasChild","childList":[]}, ... ]
 gNavPosCache = {}    # 位置导航缓存。{ '/recon/1/': articletype, ...}
 gSetupCache = {}
-
+gShowCaseList = {}
+gNavMenuList = {}
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
     global gNavPosCache
-    navMenuList = getNav()
+    global gShowCaseList
+    global gNavMenuList
+    navMenuList = gNavMenuList
 
     lArtId = request.GET.get('reqid', '0')
 
@@ -48,6 +51,7 @@ def gool(request, goolArg="", goolSecArg=""):
             renderVal["position"].append( (gNavPosCache[l_pos2]["title"],l_pos2) )
 
         if goolArg == "resec":      # 这里只是一个栏目的名字。具体显示模块是靠html文件定义的。
+            renderVal["boardPic"] = gShowCaseList[0]["exlink"]
             if goolSecArg == "1":   # 公司页面：直接显示第一条记录的内容。
                 renderVal["contSingle"] = ArticleType.objects.filter(kind__icontains=',corp-1-corpinfo-1,')[0].fk_article.all()[:1].values()[0]
                 renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
@@ -82,7 +86,7 @@ def gool(request, goolArg="", goolSecArg=""):
             else:
                 return HttpResponseRedirect('/' + goolArg + "/1/")
         elif goolArg == "rethi":    # 行业应用：全部都是一个模式。
-            renderVal["boardPic"] = "/static/img/top2.jpg"
+            renderVal["boardPic"] = gShowCaseList[1]["exlink"] #"/static/img/top2.jpg"
             lPagePer = 6
             if not goolSecArg:
               return HttpResponseRedirect('/' + goolArg + "/1/")
@@ -97,7 +101,7 @@ def gool(request, goolArg="", goolSecArg=""):
                 return render(request, "rendFrame-line.html", locals())
 
         elif goolArg == "refou":  # 典型客户，左边链接显示公司的左边链接。
-            renderVal["boardPic"] = "/static/img/top3.jpg"
+            renderVal["boardPic"] = gShowCaseList[2]["exlink"]
             renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
             renderVal["position"] = [("典型客户", '/' + goolArg + '/')]
             if lSingle:
@@ -109,7 +113,7 @@ def gool(request, goolArg="", goolSecArg=""):
                 return render(request, "rendFrame-table.html", locals())
 
         elif goolArg == "refiv":   # 行业应用。
-            renderVal["boardPic"] = "/static/img/top4.jpg"
+            renderVal["boardPic"] = gShowCaseList[3]["exlink"]
             lPagePer = 9
             if not goolSecArg:
               return HttpResponseRedirect('/' + goolArg + "/1/")
@@ -128,22 +132,34 @@ def gool(request, goolArg="", goolSecArg=""):
             renderVal["contSingle"] = ArticleType.objects.filter(kind__icontains=',cont-1,')[0].fk_article.all()[:1].values()[0]
             renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
             return render(request, "rendFrame-single.html", locals())
+        elif goolArg == "refresh":
+            global gNavCache
+            global gNavPosCache
+            global gSetupCache
+            global gShowCaseList
+
+            gNavCache = []
+            gNavPosCache = {}
+            gSetupCache = {}
+            gShowCaseList = {}
+            getNav()
+            return HttpResponse("refresh ok")
         else:
             return HttpResponseRedirect("/")
-
     except Exception as e:
         log("gool执行错误：%s" % str(e.args))
         raise(e)
         return HttpResponse("gool执行错误：%s" % str(e.args))
 
 def home(request):
+    global gSetupCache
     renderVal = {"title": gSetupCache['corp'],
                  "webrecord": gSetupCache['webrecord'],
                  "description": gSetupCache['description'],
                  "keywords": gSetupCache['keywords']
               }
-
-    showCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').values()
+    global gShowCaseList
+    showCaseList = gShowCaseList # ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').values()
     navMenuList = getNav()
     gridShowList = ArticleType.objects.filter(kind__icontains=',top-1-grid-1-list-n,').values('title', 'exlink', 'remark', 'link')
     # rightBarList 很不友好。 1、2、3、4排序来的。4是视频
@@ -158,6 +174,10 @@ def getNav():
     # return [ {"title":"", "hasChild":False, "childList":[{title:"", "link":""},{}...], "link":"" },  ... ]
     global gNavCache  # 全局缓冲，防止每次都查询数据库导航菜单。
     global gNavPosCache
+    global gSetupCache
+    global gShowCaseList
+    global gNavMenuList
+
     if len(gNavCache) > 0:
         pass
     else:
@@ -176,11 +196,12 @@ def getNav():
             navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
         log("-- i select database and cached it for menu,  --")
         gNavCache = navAllList
-    return gNavCache
+        gSetupCache = eval(ArticleType.objects.filter(kind__icontains=',top-1-setup-1,').values('remark')[0]["remark"])
+        gSetupCache.update({'description': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-desc-1,').values('remark')[0]["remark"] })
+        gSetupCache.update({'keywords': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-key-1,').values('remark')[0]["remark"] })
+        gShowCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').order_by('exorder').values()
+        gNavMenuList = gNavCache
+    return
 
 #初始化应用的变量。
 getNav()
-gSetupCache = eval(ArticleType.objects.filter(kind__icontains=',top-1-setup-1,').values('remark')[0]["remark"])
-gSetupCache.update({'description': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-desc-1,').values('remark')[0]["remark"] })
-gSetupCache.update({'keywords': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-key-1,').values('remark')[0]["remark"] })
-# {'corp':'悦源工作室', 'webrecord':'鲁ICP备12345678号'}
