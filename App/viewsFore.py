@@ -1,4 +1,4 @@
-__author__ = 'blaczom'
+__author__ = 'blaczom4gmail'
 
 from django.shortcuts import render, HttpResponse
 from django.http import HttpResponseRedirect
