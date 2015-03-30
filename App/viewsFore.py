@@ -7,17 +7,17 @@ from App.utils import log
 from App.models import Article, ArticleType
 from math import ceil
 # 第一次访问时取得内容。
-gNavCache = []       # 导航菜单缓存。[{"title","link","hasChild","childList":[]}, ... ]
 gNavPosCache = {}    # 位置导航缓存。{ '/recon/1/': articletype, ...}
 gSetupCache = {}
 gShowCaseList = {}
-gNavMenuList = {}
+gNavMenuList = {}   # 导航菜单缓存。[{"title","link","hasChild","childList":[]}, ... ]
 
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
     global gNavPosCache
     global gShowCaseList
     global gNavMenuList
+    global gSetupCache
     navMenuList = gNavMenuList
 
     lArtId = request.GET.get('reqid', '0')
@@ -134,12 +134,12 @@ def gool(request, goolArg="", goolSecArg=""):
             renderVal["leftList1"] = ArticleType.objects.filter(kind__icontains=',corp-1-list1-n,').order_by('exorder').values()
             return render(request, "rendFrame-single.html", locals())
         elif goolArg == "refresh":
-            global gNavCache
+            global gNavMenuList
             global gNavPosCache
             global gSetupCache
             global gShowCaseList
 
-            gNavCache = []
+            gNavMenuList = []
             gNavPosCache = {}
             gSetupCache = {}
             gShowCaseList = {}
@@ -154,14 +154,16 @@ def gool(request, goolArg="", goolSecArg=""):
 
 def home(request):
     global gSetupCache
+    global gShowCaseList
+
     renderVal = {"title": gSetupCache['corp'],
                  "webrecord": gSetupCache['webrecord'],
                  "description": gSetupCache['description'],
                  "keywords": gSetupCache['keywords']
               }
-    global gShowCaseList
+
     showCaseList = gShowCaseList # ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').values()
-    navMenuList = getNav()
+    navMenuList = gNavMenuList
     gridShowList = ArticleType.objects.filter(kind__icontains=',top-1-grid-1-list-n,').values('title', 'exlink', 'remark', 'link')
     # rightBarList 很不友好。 1、2、3、4排序来的。4是视频
     rightBarList = ArticleType.objects.filter(kind__icontains=',top-1-right-1-n,').order_by('exorder').values('title', 'exlink', 'remark', 'link')
@@ -173,13 +175,12 @@ def home(request):
 
 def getNav():
     # return [ {"title":"", "hasChild":False, "childList":[{title:"", "link":""},{}...], "link":"" },  ... ]
-    global gNavCache  # 全局缓冲，防止每次都查询数据库导航菜单。
     global gNavPosCache
     global gSetupCache
     global gShowCaseList
-    global gNavMenuList
+    global gNavMenuList   # 全局缓冲，防止每次都查询数据库导航菜单。
 
-    if len(gNavCache) > 0:
+    if len(gNavMenuList) > 0:
         pass
     else:
         navTopList = ArticleType.objects.filter(kind__icontains=',nav0-n,').order_by('exorder').values()
@@ -196,12 +197,12 @@ def getNav():
                     gNavPosCache.update({iSub['link']: iSub}) # 缓存所有的记录。方便查找拉。
             navAllList.append({"title": iTop["title"], "link":iTop["link"], "hasChild":hasChildTmp, "childList":childListTmp })
         log("-- i select database and cached it for menu,  --")
-        gNavCache = navAllList
+        gNavMenuList = navAllList
         gSetupCache = eval(ArticleType.objects.filter(kind__icontains=',top-1-setup-1,').values('remark')[0]["remark"])
         gSetupCache.update({'description': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-desc-1,').values('remark')[0]["remark"] })
         gSetupCache.update({'keywords': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-key-1,').values('remark')[0]["remark"] })
         gShowCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').order_by('exorder').values()
-        gNavMenuList = gNavCache
+
     return
 
 #初始化应用的变量。
