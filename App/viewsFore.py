@@ -12,6 +12,7 @@ gNavPosCache = {}    # 位置导航缓存。{ '/recon/1/': articletype, ...}
 gSetupCache = {}
 gShowCaseList = {}
 gNavMenuList = {}
+
 @require_http_methods(["GET"])
 def gool(request, goolArg="", goolSecArg=""):
     global gNavPosCache
