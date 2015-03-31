@@ -31,7 +31,7 @@ def gool(request, goolArg="", goolSecArg=""):
                  "webrecord": gSetupCache['webrecord'],
                  "description": gSetupCache['description'],
                  "keywords": gSetupCache['keywords'],
-
+                 "scanimg" : gSetupCache['scanimg'],
                  "boardPic": "/static/img/top1.jpg",
                  "position": [("公司", '/resec/1/'), ("公司简介", '/resec/1/')],
                  "artId": lArtId,
