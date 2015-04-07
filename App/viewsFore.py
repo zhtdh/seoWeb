@@ -199,6 +199,9 @@ def getNav():
         log("-- i select database and cached it for menu,  --")
         gNavMenuList = navAllList
         gSetupCache = eval(ArticleType.objects.filter(kind__icontains=',top-1-setup-1,').values('remark')[0]["remark"])
+        #
+        if ('scanimg' not in gSetupCache.keys()):
+          gSetupCache['scanimg'] = ""
         gSetupCache.update({'description': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-desc-1,').values('remark')[0]["remark"] })
         gSetupCache.update({'keywords': ArticleType.objects.filter(kind__icontains=',top-1-setup-1-key-1,').values('remark')[0]["remark"] })
         gShowCaseList = ArticleType.objects.filter(kind__icontains=',top-1-showcase-1-list-n,').order_by('exorder').values()

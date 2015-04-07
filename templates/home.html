@@ -20,7 +20,7 @@
       <div class="carousel-inner" role="listbox">
         {% for showCase in showCaseList %}
         <div class="item {% if forloop.first %} active {% endif %}">
-          <a href="{{ showCase.link }}"><img src="{{ showCase.exlink }}"></a>
+          <a href="{{ showCase.link }}"><img src="{{ showCase.exlink }}" style="width:970px;height:300px;"> </a>
           <div class="carousel-caption">
             {{ showCase.title }}
           </div>
@@ -49,7 +49,7 @@
       <div class="col-xs-6 topgrey-background" style="padding-top: 10px;">
         <div class="block block-light block-center block-shadow border-allthick">
           <h4 class="heading-primary"><a href="{{ iGridItem.link }}"> {{ iGridItem.title }} </a> </h4>
-          <a href="{{ iGridItem.link }}"><img class="img-thumbnail" src="{{ iGridItem.exlink }}"></a>
+          <a href="{{ iGridItem.link }}"><img class="img-thumbnail" src="{{ iGridItem.exlink }}" style="width:240px;height:135px;"></a>
           <p> {{ iGridItem.remark|safe }}</p>
         </div>
       </div>
@@ -83,7 +83,7 @@
           <ul class="list list-feature" style="padding-top: -5px; font-size: 85%; line-height: 1.5em;">
             {% for barGet1List in rightBarGet1List %}
             <li style="height:26px;"> <i class="glyphicon glyphicon-ok primary-color"></i> <span>
-              <a href ="{{  rightBarList.0.link }}?reqid={{ barGet1List.id }}">{{ barGet1List.title }}</a> </span> </li>
+              <a href ="{{  rightBarList.0.link }}?reqid={{ barGet1List.id }}">{{ barGet1List.title|truncatechars:20 }}</a> </span> </li>
             {% endfor %}
 
           </ul>
@@ -92,7 +92,7 @@
         <div role="tabpanel" class="tab-pane fade" id="profile" aria-labelledby="profile-tab">
           {% for barGet2List in rightBarGet2List %}
             <li style="height:26px;"> <i class="glyphicon glyphicon-ok primary-color"></i> <span>
-              <a href ="{{  rightBarList.1.link }}?reqid={{ barGet2List.id }}">{{ barGet2List.title }}</a> </span> </li>
+              <a href ="{{  rightBarList.1.link }}?reqid={{ barGet2List.id }}">{{ barGet2List.title|truncatechars:20 }}</a> </span> </li>
             {% endfor %}
         </div>
 
