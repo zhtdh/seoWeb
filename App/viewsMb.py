@@ -6,10 +6,10 @@ from django.views.decorators.http import *
 from App.utils import log
 from App.models import Article, ArticleType
 from math import ceil
-
+import json
 
 def getRest(request, aGetType=""):
-    print('i get here')
+    print('i get here', request.GET.get('jpargs', '0'))
 
     lArtId = request.GET.get('reqid', '0')
 

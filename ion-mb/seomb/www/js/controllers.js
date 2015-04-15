@@ -44,15 +44,24 @@ angular.module('starter.controllers', [])
 
 
   var ls = {jpargs: {"func":"getUserList","ex_parm": {"location":{"pageCurrent":1,"pageRows":10,"pageTotal":0}}}};
+/*
+  $http.get('http://127.0.0.1:8000/restmb/?callback=JSON_CALLBACK&&'+ 'jpargs='+JSON.stringify(ls)).success(function(data)
+  {
+    console.log('sucess', data);
+  });
 
-  $http.jsonp('http://127.0.0.1:8000/restmb/callback=JSON_CALLBACK')
+  // No 'Access-Control-Allow-Origin' header is present on the requested resource .
+*/
+   /*
+  $http.jsonp('http://127.0.0.1:8000/restmb/?callback=JSON_CALLBACK&&' + 'jpargs='+JSON.stringify(ls))
       .success(function (data, status, headers, config) {
-        console.log(data);
+        console.log('sucess', data);
       })
       .error(function (data, status, headers, config) {
-        console.log(data);
+        console.log('fail', data);
+        alert('fail');
       });
-
+*/
   lp.typeLists = [
     { title: lType, id:0},
     { title: 'Reggae', id: 1 },
