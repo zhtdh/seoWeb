@@ -1,17 +1,38 @@
-<ion-view view-title="首页">
+<ion-view view-title="悦库移动平台">
   <ion-content>
-    <h1>xxx手机平台</h1>
-    <div>
-        公司简介
+
+    <div class="row responsive-md" >
+      <div id="divCompany" ng-click="clickDiv(1)" class="col col-40 button-large"
+           style="text-align:center;line-height:100px;min-height:100px;background-color:lightseagreen;margin:10px 10px 0px 0px;">
+          <i class="icon ion-android-home"> </i>公司相关
+      </div>
+
+      <div ng-click="clickDiv(2)" class="col col-40 button-large"
+           style="text-align:center;line-height:100px;min-height:100px;background-color: lightseagreen;margin:10px 10px 0px 0px;">
+          <i class="icon ion-planet"></i> 产品简介
+      </div>
+
     </div>
-    <div>
-        产品简介
+
+    <div class="row responsive-md" >
+      <div id="divCompany" ng-click="clickDiv(3)" class="col col-40 button-large"
+           style="text-align:center;line-height:100px;min-height:100px;background-color: lightseagreen;margin:10px 10px 0px 0px;">
+          <i class="icon ion-briefcase"> </i>行业应用
+      </div>
+
+      <div ng-click="clickDiv(4)" class="col col-40 button-large"
+           style="text-align:center;line-height:100px;min-height:100px;background-color: lightseagreen;margin:10px 10px 0px 0px;">
+          <i class="icon ion-android-contact"></i> 客户案例
+      </div>
+
     </div>
-    <div>
-        行业应用
-    </div>
-    <div>
-        联系我们
+
+    <div class="row responsive-md" >
+
+      <div ng-click="clickDiv(5)" class="col col-40 col-offset-20 button-large"
+           style="text-align:center;line-height:100px;min-height:100px;background-color: lightseagreen;margin:10px 10px 0px 0px;"">
+          <i class="icon ion-android-contact"></i> 联系我们
+      </div>
     </div>
 
   </ion-content>

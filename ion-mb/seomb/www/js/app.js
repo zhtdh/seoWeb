@@ -34,7 +34,18 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     url: "/top",
     views: {
       'menuContent': {
-        templateUrl: "templates/top.html"
+        templateUrl: "templates/top.html",controller: 'topCtrl'
+      }
+
+    }
+  })
+
+  .state('app.atype', {
+    url: "/top/:atype",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/typeList.html",
+        controller: 'typeListCtrl'
       }
     }
   })
@@ -47,25 +58,18 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       }
     }
   })
-    .state('app.playlists', {
-      url: "/playlists",
+    .state('app.artlists', {
+      url: "/artlists",
       views: {
         'menuContent': {
-          templateUrl: "templates/playlists.html",
-          controller: 'PlaylistsCtrl'
+          templateUrl: "templates/artlists.html",
+          controller: 'typeListCtrl'
         }
       }
     })
 
-  .state('app.single', {
-    url: "/playlists/:playlistId",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/playlist.html",
-        controller: 'PlaylistCtrl'
-      }
-    }
-  });
+
+  ;
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/top');
 });

@@ -337,6 +337,8 @@ def getArticlesByKind(p_dict, p_rtn):
 
 def dealREST(request):
   l_rtn = genRtnOk("执行成功")
+  print(request.POST)
+
   try:
     ldict = json.loads(request.POST['jpargs'])
 

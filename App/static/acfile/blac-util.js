@@ -177,6 +177,9 @@ angular.module('blac-util', ['angular-md5'])
         .error(function (data, status, headers, config) {
           deferred.reject(status);
         });
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+
       */
       $rootScope.$broadcast(gEvent.broadcast, "访问服务器...");
       $.ajax({

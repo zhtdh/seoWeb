@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from App import views, viewsFore
+from App import views, viewsFore, viewsMb
 
 urlpatterns = patterns('',
   url(r'^$', 'App.viewsFore.home', name='home'),
@@ -7,7 +7,11 @@ urlpatterns = patterns('',
   url(r'^notstatic/js/ueditor/controller', views.ueditorController,name='ueditor'),
   url(r'^rest/$',views.dealREST,name='rest'),
 
-  url(r'^(?P<goolArg>\w+)/$', viewsFore.gool, name='gool'),
+  url(r'^restmb/$',viewsMb.getRest,name='restmb'),
+
+  url(r'^(?P<goolArg>\w+)/$', viewsFore.gool, name='gool'),  # 顺序很重要，放到最后。
   url(r'^(?P<goolArg>\w+)/(?P<goolSecArg>\w+)/$', viewsFore.gool, name='goolsub'),
+
+
 )
 

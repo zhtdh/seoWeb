@@ -14,21 +14,27 @@
 
   <ion-side-menu side="left">
     <ion-header-bar class="bar-positive bar-stable">
-      <h1 class="title">Left</h1>
+      <h1 class="title">导航</h1>
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <ion-item nav-clear menu-close ng-click="login()">
-          Login
+        <ion-item nav-clear menu-close href="#/app/top">
+          首页
         </ion-item>
-        <ion-item nav-clear menu-close href="#/app/search">
-          Search
+        <ion-item nav-clear menu-close href="#/app/top/corp">
+          公司相关
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/top/product">
+          产品应用
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/top/industry">
+          行业应用
         </ion-item>
         <ion-item nav-clear menu-close href="#/app/browse">
-          Browse
+          客户案例
         </ion-item>
-        <ion-item nav-clear menu-close href="#/app/playlists">
-          Playlists
+        <ion-item nav-clear menu-close ng-click="login()">
+          联系我们
         </ion-item>
       </ion-list>
     </ion-content>

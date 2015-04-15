@@ -33,8 +33,28 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PlaylistsCtrl', function($scope) {
-  $scope.playlists = [
+.controller('topCtrl', function($scope) {
+    $scope.clickDiv = function(aArg){alert(aArg) };
+})
+
+.controller('typeListCtrl', function($scope, $stateParams, $http) {
+
+  var lType = $stateParams.atype;
+  var lp = $scope;
+
+
+  var ls = {jpargs: {"func":"getUserList","ex_parm": {"location":{"pageCurrent":1,"pageRows":10,"pageTotal":0}}}};
+
+  $http.jsonp('http://127.0.0.1:8000/restmb/callback=JSON_CALLBACK')
+      .success(function (data, status, headers, config) {
+        console.log(data);
+      })
+      .error(function (data, status, headers, config) {
+        console.log(data);
+      });
+
+  lp.typeLists = [
+    { title: lType, id:0},
     { title: 'Reggae', id: 1 },
     { title: 'Chill', id: 2 },
     { title: 'Dubstep', id: 3 },
@@ -44,5 +64,8 @@ angular.module('starter.controllers', [])
   ];
 })
 
+
 .controller('PlaylistCtrl', function($scope, $stateParams) {
+
+
 });
