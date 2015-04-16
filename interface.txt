@@ -211,3 +211,37 @@ jpargs:{
 database说明：
 导出的栏目数据。导入：
 替换： "items":     -> "state": "new","items":
+
+
+=================================
+mobile local access:
+/top  首页
+/top/:atype      子栏目列表，比如公司相关下：公司简介，资质，动态栏目
+/browse/:alist   子栏目下面的文章列表。动态栏目下面的内容。
+xxx   选择弹出内容。
+
+-----------------
+mobile server access rest frame:
+-------
+url(r'^mbjp/$',viewsMb.getJsonp,name='mbjp'),
+var ls_json = {"f":"type","pid":"", "id": "xxxx", "loc":{"pn":1,"pr":10,"pall":0} };
+-------
+1/得到列表下面的所有子列表。mbjp/jpargs={fun:'typelist', type:'corp....'  }
+2/得到指定列表下面的所有文章。mbjp/jpargs={fun:'artlist', pid:'xxxx', loc:{pn:0, pr:10, pa:10 }}
+3/得到指定的文章。 mbjp/jpargs={fun:'getart', pid:'xxxx'} 返回article
+4/得到栏目下面的第一个文章。 mbjp/jpargs={fun:'getfirst', type:'xxxx'} 返回type下面的第一个article
+
+
+/*
+  $http.get('http://127.0.0.1:8000/restmb/?callback=JSON_CALLBACK&&'+ 'jpargs='+JSON.stringify(ls)).success(function(data)
+  // No 'Access-Control-Allow-Origin' header is present on the requested resource .
+*/
+
+
+
+////// debug
+python manage.py shell
+from App.models import Article, ArticleType
+
+
+

@@ -29,7 +29,6 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     templateUrl: "templates/menu.html",
     controller: 'AppCtrl'
   })
-
   .state('app.top', {
     url: "/top",
     views: {
@@ -39,13 +38,21 @@ angular.module('starter', ['ionic', 'starter.controllers'])
 
     }
   })
-
   .state('app.atype', {
     url: "/top/:atype",
     views: {
       'menuContent': {
         templateUrl: "templates/typeList.html",
         controller: 'typeListCtrl'
+      }
+    }
+  })
+  .state('app.artlist', {
+    url: "/artlist/:atype",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/artlist.html",
+        controller: 'artListCtrl'
       }
     }
   })
@@ -58,15 +65,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       }
     }
   })
-    .state('app.artlists', {
-      url: "/artlists",
-      views: {
-        'menuContent': {
-          templateUrl: "templates/artlists.html",
-          controller: 'typeListCtrl'
-        }
-      }
-    })
+
 
 
   ;

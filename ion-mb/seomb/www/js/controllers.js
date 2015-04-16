@@ -1,6 +1,53 @@
-angular.module('starter.controllers', [])
+app = angular.module('starter.controllers', []);
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+app.factory('blacAccess', function($http,$q){
+
+    var getJsonp = function(aType, aEx){
+      var deferred = $q.defer();
+      var ls_url = 'http://127.0.0.1:8000/mbjp/?callback=JSON_CALLBACK';
+      var lo_json = {};  // var lo_json = {"fun":"typelist", "type": lType, "loc":{"pn":1,"pr":10,"pall":0} };
+      switch(aType)
+      {
+        case 'corp':       // ,corp-1,
+        case 'product':    // ,corp-1,
+        case 'industry':   // ,corp-1,
+        case 'custom':     // ,corp-1,
+          lo_json = {"fun":"typelist", "exp": aType};
+          break;
+        case 'contact':
+        case 'corpinfo':
+          lo_json = {"fun":"getfirst", "exp": aType};
+          break;
+
+        case 'artlist':     // aEx = {pid: xxx, loc :{"pn":1,"pr":10,"pall":0} }
+          lo_json = {"fun":"artlist", "exp": aEx };
+          break;
+        case 'article':     // aEx = {pid: xxx }
+          lo_json = {"fun":"getart", "exp": aEx};
+          break;
+        default:
+          break;
+      }
+
+      $http.jsonp(ls_url + '&&jpargs=' + JSON.stringify(lo_json))
+        .success(function (data, status, headers, config) {
+          console.log('sucess', data);
+          deferred.resolve(data || []);
+        })
+        .error(function (data, status, headers, config) {
+          console.log('fail', data);
+          deferred.reject(data);
+        });
+
+      return deferred.promise;
+    }
+
+    return {
+      getJsonp: getJsonp  // getJsonp('data').then(function(data){}, function(err){})
+    } ;
+  });
+
+app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -37,42 +84,49 @@ angular.module('starter.controllers', [])
     $scope.clickDiv = function(aArg){alert(aArg) };
 })
 
-.controller('typeListCtrl', function($scope, $stateParams, $http) {
+.controller('typeListCtrl', function($scope, blacAccess, $stateParams, $http) {
 
   var lType = $stateParams.atype;
   var lp = $scope;
+  lp.typeLists = [];
 
-
-  var ls = {jpargs: {"func":"getUserList","ex_parm": {"location":{"pageCurrent":1,"pageRows":10,"pageTotal":0}}}};
-/*
-  $http.get('http://127.0.0.1:8000/restmb/?callback=JSON_CALLBACK&&'+ 'jpargs='+JSON.stringify(ls)).success(function(data)
-  {
-    console.log('sucess', data);
-  });
-
-  // No 'Access-Control-Allow-Origin' header is present on the requested resource .
-*/
-   /*
-  $http.jsonp('http://127.0.0.1:8000/restmb/?callback=JSON_CALLBACK&&' + 'jpargs='+JSON.stringify(ls))
-      .success(function (data, status, headers, config) {
-        console.log('sucess', data);
-      })
-      .error(function (data, status, headers, config) {
-        console.log('fail', data);
-        alert('fail');
-      });
-*/
-  lp.typeLists = [
-    { title: lType, id:0},
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-  ];
+  blacAccess.getJsonp(lType)
+    .then(function (aRtn) {
+      lp.txtReturn = JSON.stringify( aRtn.rtnInfo );
+      lp.typeLists = aRtn.exObj.data;
+    },
+    function (err) {
+      lp.txtReturn = JSON.stringify(err);
+    }
+  );
 })
 
+.controller('artListCtrl', function($scope, blacAccess, $stateParams, $http) {
+
+  var lType = $stateParams.atype;  // articletype 's id.
+  var lp = $scope;
+  lp.artLists = [];
+  lp.loc = {pn:0, pr:10, pa:-1 };
+  lp.nomore = false;
+
+  lp.getMore = function(){
+    lp.loc.pn = lp.loc.pn + 1;
+    blacAccess.getJsonp(lType, {pid:lType, loc:lp.loc} )
+      .then(function (aRtn) {
+        lp.txtReturn = JSON.stringify( aRtn.rtnInfo );
+        lp.artLists.concat(aRtn.exObj.data);
+        lp.loc.pa = aRtn.exObj.loc.pa;
+        if (lp.loc.pa < (lp.loc.pn * lp.loc.pr)) lp.nomore = false; else lp.nomore = true;
+      },
+      function (err) {
+        lp.txtReturn = JSON.stringify(err);
+      }
+    );
+  }
+
+
+
+})
 
 .controller('PlaylistCtrl', function($scope, $stateParams) {
 

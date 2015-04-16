@@ -241,7 +241,6 @@ def resetPw(p_dict, p_rtn):
   except ObjectDoesNotExist:
     p_rtn.update(genRtnFail(None, "用户名错误"))
 
-
 def getArticleTypesByKind(p_dict, p_rtn):
   """
     模糊查询kind值，返回ArticleType数组
@@ -274,7 +273,6 @@ def getArticleTypesByKind(p_dict, p_rtn):
       "contentList": rtn_list
     }
   })
-
 
 def getArticlesByKind(p_dict, p_rtn):
   """
@@ -333,7 +331,6 @@ def getArticlesByKind(p_dict, p_rtn):
       "contentList": rtn_list
     }
   })
-
 
 def dealREST(request):
   l_rtn = genRtnOk("执行成功")
@@ -401,7 +398,6 @@ def ueditorController(request):
                                      "appendOper": "login"
                                    }, ensure_ascii=False), content_type="application/javascript")
   return get_ueditor_controller(request)
-
 
 def rawsql4rtn(aSql):
   """  根据sql语句，返回数据和记录总数。  """
