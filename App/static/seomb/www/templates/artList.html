@@ -1,0 +1,14 @@
+<ion-view view-title="文章列表">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="artList in artLists" ng-click="showArticle(artList.id)">
+        {{artList.title}}
+      </ion-item>
+    </ion-list>
+
+    <div class="row">
+      <button class="button button-block button-positive" ng-disabled="nomore" ng-click="getMore()"> 下10条 </button>
+    </div>
+
+  </ion-content>
+</ion-view>

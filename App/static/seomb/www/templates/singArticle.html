@@ -1,0 +1,31 @@
+<ion-modal-view>
+  <ion-header-bar>
+    <h1 class="title">文 章</h1>
+    <div class="buttons">
+      <button class="button button-clear" ng-click="closeLogin()">Close</button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <form>
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">文章标题</span>
+          <input type="text" ng-model="article.title">
+        </label>
+        <div class="row" style="min-height: 100px;padding-left:20px;">
+          <div data-ng-bind-html="article.content"></div>
+        </div>
+
+
+        <label class="item item-input">
+          <span class="input-label">创建者</span>
+          <input type="text" ng-model="article.recname">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">创建时间</span>
+          <input type="text" ng-model="article.rectime">
+        </label>
+      </div>
+    </form>
+  </ion-content>
+</ion-modal-view>

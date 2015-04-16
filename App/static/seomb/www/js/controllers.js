@@ -11,18 +11,17 @@ app.factory('blacAccess', function($http,$q){
         case 'corp':       // ,corp-1,
         case 'product':    // ,corp-1,
         case 'industry':   // ,corp-1,
-        case 'custom':     // ,corp-1,
           lo_json = {"fun":"typelist", "exp": aType};
           break;
         case 'contact':
         case 'corpinfo':
           lo_json = {"fun":"getfirst", "exp": aType};
           break;
-
-        case 'artlist':     // aEx = {pid: xxx, loc :{"pn":1,"pr":10,"pall":0} }
+        case 'artlist':     // aEx = { pid: xxx, loc :{"pn":1,"pr":10,"pall":0} }
+          if (aEx.pid == 'custom') aEx.pid = 'C67B827ABA30000162DB157B90C560';
           lo_json = {"fun":"artlist", "exp": aEx };
           break;
-        case 'article':     // aEx = {pid: xxx }
+        case 'getart':     // aEx = {pid: xxx }
           lo_json = {"fun":"getart", "exp": aEx};
           break;
         default:
@@ -49,10 +48,10 @@ app.factory('blacAccess', function($http,$q){
 
 app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
   // Form data for the login modal
-  $scope.loginData = {};
+  $scope.article = {};
 
   // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
+  $ionicModal.fromTemplateUrl('templates/singArticle.html', {
     scope: $scope
   }).then(function(modal) {
     $scope.modal = modal;
@@ -68,20 +67,44 @@ app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
     $scope.modal.show();
   };
 
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
-  };
+  var lp = $scope;
+  lp.showArticle = function(aId){
+    blacAccess.getJsonp('getart', { pid:aId } )
+      .then(function (aRtn) {
+        if( aRtn.exObj.data.length > 0) {
+          $scope.article = aRtn.exObj.data[0];
+          $scope.modal.show(); }
+        else
+          alert('数据检索失败。')
+      },
+      function (err) {
+        console.log('err', err)
+        alert('访问服务器失败。')
+      })
+  }
 })
 
-.controller('topCtrl', function($scope) {
-    $scope.clickDiv = function(aArg){alert(aArg) };
+.controller('topCtrl', function($scope, $state) {
+    $scope.clickDiv = function(aArg){
+      // alert(aArg)
+      switch(aArg) {
+        case 1: // 公司
+          $state.go('app.atype', { atype : 'corp' });
+          break;
+        case 2:
+          $state.go('app.atype', { atype : 'product' });
+          break;
+        case 3:
+          $state.go('app.atype', { atype : 'industry' });
+          break;
+        case 4:
+          $state.go('app.artlist', { atype : 'custom' });
+          break;
+        case 5:
+          showArticle('C6843ABD76400001A9521DC180BF30');
+          break;
+      }
+    };
 })
 
 .controller('typeListCtrl', function($scope, blacAccess, $stateParams, $http) {
@@ -111,24 +134,19 @@ app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
 
   lp.getMore = function(){
     lp.loc.pn = lp.loc.pn + 1;
-    blacAccess.getJsonp(lType, {pid:lType, loc:lp.loc} )
+    blacAccess.getJsonp('artlist', {pid:lType, loc:lp.loc} )
       .then(function (aRtn) {
         lp.txtReturn = JSON.stringify( aRtn.rtnInfo );
-        lp.artLists.concat(aRtn.exObj.data);
+        Array.prototype.push.apply(lp.artLists, aRtn.exObj.data)
         lp.loc.pa = aRtn.exObj.loc.pa;
-        if (lp.loc.pa < (lp.loc.pn * lp.loc.pr)) lp.nomore = false; else lp.nomore = true;
+        if (lp.loc.pa < (lp.loc.pn * lp.loc.pr)) lp.nomore = true; else lp.nomore = false;
       },
       function (err) {
         lp.txtReturn = JSON.stringify(err);
       }
     );
   }
-
-
-
+  // 如果是公司简介的话，就直接不用列出来。
+  lp.getMore();
 })
-
-.controller('PlaylistCtrl', function($scope, $stateParams) {
-
-
-});
+;

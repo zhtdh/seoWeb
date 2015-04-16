@@ -1,0 +1,13 @@
+<ion-view view-title="文章列表">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-click="showArticle('C6846E99C550000161C16AD0E02440')" >
+        {{typeLists[0].title}}
+      </ion-item>
+
+      <ion-item ng-repeat="typeList in typeLists" href="#/app/artlist/{{typeList.id}}" ng-if="typeList.id !== 'C6843C7532400001808218FE303460'">
+        {{typeList.title}}
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

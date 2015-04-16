@@ -38,7 +38,7 @@ def getJsonp(request):
         t = ArticleType.objects.filter(kind__icontains=',case-1,')
       else:
         pass
-      rtn_list = list(ArticleType.objects.filter(parent_id = t).values('id', 'title'))
+      rtn_list = list(ArticleType.objects.filter(parent_id = t).values('id', 'title', 'parent_id'))
       p_rtn.update({
         "rtnInfo": '成功',
         "rtnCode": 1,
@@ -46,9 +46,12 @@ def getJsonp(request):
       })
     elif l_getType == "artlist":
       #  ldict['exp']   ldict['exp']= {pid: xxx, loc :{"pn":1,"pr":10,"pa":0} }
+
       l_first , l_end, l_all = getPageRow( ldict['exp']['loc'] )
+
       if (l_all < 0):
         l_all = Article.objects.filter(parent_id = ldict['exp']['pid']).count()
+      print('custom artlist', l_first, l_end, l_all)
       rtn_list = list(Article.objects.filter(parent_id = ldict['exp']['pid'])[l_first:l_end].values('id', 'title'))
 
       p_rtn.update({
@@ -56,8 +59,13 @@ def getJsonp(request):
         "rtnCode": 1,
         "exObj": { "data": rtn_list, "loc":{"pa": l_all} }
       })
-    elif l_getType == "article":
-      pass
+    elif l_getType == "getart":
+      rtn_list = list(Article.objects.filter(id = ldict['exp']['pid']).values('id', 'title', 'content', 'rectime', 'recname'))
+      p_rtn.update({
+        "rtnInfo": '成功',
+        "rtnCode": 1,
+        "exObj": { "data": rtn_list }
+      })
     else:
       pass
 
