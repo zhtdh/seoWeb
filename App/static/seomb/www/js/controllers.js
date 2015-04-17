@@ -48,6 +48,7 @@ app.factory('blacAccess', function($http,$q){
 
 app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
   // Form data for the login modal
+
   $scope.article = {};
 
   // Create the login modal that we will use later
@@ -82,9 +83,16 @@ app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
         alert('访问服务器失败。')
       })
   }
+
+  lp.$on("showArticle", function(event, aInfo){
+    console.log('get broadcast ', event, aInfo);
+    lp.showArticle(aInfo);
+
+  });
+
 })
 
-.controller('topCtrl', function($scope, $state) {
+.controller('topCtrl', function($rootScope, $scope, $state) {
     $scope.clickDiv = function(aArg){
       // alert(aArg)
       switch(aArg) {
@@ -101,7 +109,7 @@ app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
           $state.go('app.artlist', { atype : 'custom' });
           break;
         case 5:
-          showArticle('C6843ABD76400001A9521DC180BF30');
+          $rootScope.$broadcast('showArticle', 'C6843ABD76400001A9521DC180BF30')
           break;
       }
     };
