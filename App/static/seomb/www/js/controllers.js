@@ -46,7 +46,7 @@ app.factory('blacAccess', function($http,$q){
     } ;
   });
 
-app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
+app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout, $sce) {
   // Form data for the login modal
 
   $scope.article = {};
@@ -74,6 +74,8 @@ app.controller('AppCtrl', function($scope, blacAccess, $ionicModal, $timeout) {
       .then(function (aRtn) {
         if( aRtn.exObj.data.length > 0) {
           $scope.article = aRtn.exObj.data[0];
+          $scope.tempContent = $sce.trustAsHtml($scope.article.content);
+
           $scope.modal.show(); }
         else
           alert('数据检索失败。')
