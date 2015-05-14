@@ -342,17 +342,11 @@ def dealREST(request):
     if 'ex_parm' not in ldict or 'func' not in ldict:
       raise AppException('传入参数错误')
 
-    if (not 'username' in request.session.keys()) :
-      if ldict['func'] in ('userlogin', ''):
-        pass
-      else:
-        raise AppException('未登录。')
+    if ldict['func'] in ('userlogin', ''):
+      pass
     else:
-      if (not len(request.session['username']) > 1):
-        if ldict['func'] in ('userlogin', ''):
-          pass
-        else:
-          raise AppException('未登录。')
+      if (not 'username' in request.session.keys()) or ( not len (request.session['username']) > 0 ) :
+        raise AppException('未登录。')
 
     with transaction.atomic():
       if ldict['func'] == 'userlogin':

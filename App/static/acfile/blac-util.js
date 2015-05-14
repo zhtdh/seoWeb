@@ -228,6 +228,7 @@ angular.module('blac-util', ['angular-md5'])
 
     return {   // xxx().then(function(data){}, function(err){})
       userLoginQ: userLoginQ,
+      userLogOutQ: userLogOutQ,
       userChange:function(aUser,aOld,aNew){return httpQ( lpUrl,{func:'userChange',
         ex_parm:{username:aUser,old:md5.createHash(aUser+aOld), new: md5.createHash(aUser+aNew)}})},
       getAdminColumn:function(aParam){return httpQ(lpUrl,{func:'getAdminColumn',ex_parm:aParam })},

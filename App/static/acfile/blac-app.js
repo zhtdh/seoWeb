@@ -78,8 +78,9 @@ app.controller("ctrlAdminTop",function($location,$scope,blacStore,blacAccess) {
   });
   lp.logout = function(){
     lp.loginedUser = null
-    blacAccess.userLogOutQ()
-    $location.path('/login')
+    blacAccess.userLogOutQ().then( function(data) {
+        $location.path('/login')
+    }, function (error) {  lp.rtnInfo = JSON.stringify(error); });
   }
 
 });
