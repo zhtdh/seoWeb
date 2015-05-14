@@ -334,7 +334,7 @@ def getArticlesByKind(p_dict, p_rtn):
 
 def dealREST(request):
   l_rtn = genRtnOk("执行成功")
-  print(request.POST)
+  #print(request.POST)
 
   try:
     ldict = json.loads(request.POST['jpargs'])
@@ -342,10 +342,24 @@ def dealREST(request):
     if 'ex_parm' not in ldict or 'func' not in ldict:
       raise AppException('传入参数错误')
 
+    if (not 'username' in request.session.keys()) :
+      if ldict['func'] in ('userlogin', ''):
+        pass
+      else:
+        raise AppException('未登录。')
+    else:
+      if (not len(request.session['username']) > 1):
+        if ldict['func'] in ('userlogin', ''):
+          pass
+        else:
+          raise AppException('未登录。')
+
     with transaction.atomic():
       if ldict['func'] == 'userlogin':
         logon(request.session, ldict['ex_parm']['user'], l_rtn)
       else:
+        if ldict['func'] == 'userlogout':
+          request.session['username'] = ''
         if ldict['func'] == 'setAdminColumn':
           dealArticleType(ldict['ex_parm']['columnTree'], l_rtn)
         elif ldict['func'] == 'getAdminColumn':

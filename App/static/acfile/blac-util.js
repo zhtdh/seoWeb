@@ -210,6 +210,10 @@ angular.module('blac-util', ['angular-md5'])
       delete(lObjUser.rem);
       return httpQ(lpUrl, { func: 'userlogin', ex_parm:{ user: lObjUser } } );
     };
+    var userLogOutQ = function(){
+      return httpQ(lpUrl, { func: 'userlogout', ex_parm:{} } );
+    }
+
     var checkRtn = function (aRtn) {
       if (aRtn.rtnCode == 0)       // 当返回0的时候表示有后续的附加操作。进一步判断appendOper
         switch (aRtn.appendOper) {  // appendOper: login
